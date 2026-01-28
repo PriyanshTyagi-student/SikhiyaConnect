@@ -16,6 +16,16 @@ interface AuthContextType {
   updateUser: (user: User) => void;
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+if (!API_URL) {
+  throw new Error("NEXT_PUBLIC_API_URL is not defined");
+}
+
+const TOKEN_KEY = "sikhiya_token";
+const USER_KEY = "sikhiya_user";
+
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -23,45 +33,70 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [usersData, setUsersData] = useState<Record<string, User>>(mockUsers);
 
-  const login = useCallback(async (email: string, password: string) => {
-    setIsLoading(true);
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    // Mock authentication - in real app this would call an API
-    const foundUser = Object.values(usersData).find(u => u.email === email);
-    if (foundUser) {
-      setUser(foundUser);
-    } else {
-      throw new Error('Invalid credentials');
-    }
-    setIsLoading(false);
-  }, [usersData]);
+  React.useEffect(() => {
+  const token = localStorage.getItem(TOKEN_KEY);
+  const savedUser = localStorage.getItem(USER_KEY);
 
-  const logout = useCallback(() => {
-    setUser(null);
-  }, []);
+  if (token && savedUser) {
+    setUser(JSON.parse(savedUser));
+  }
+}, []);
 
-  const signup = useCallback(async (email: string, password: string, name: string, role: 'student' | 'teacher') => {
-    setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    // Mock signup - in real app this would call an API
-    const newUser: User = {
-      id: `${role}-${Date.now()}`,
-      email,
-      name,
-      role,
-      avatar: role === 'student' ? '👩‍🎓' : '👨‍🏫',
-      createdAt: new Date(),
-      // Teachers start as pending
-      teacherStatus: role === 'teacher' ? 'pending' : undefined,
-    };
-    setUser(newUser);
-    // Add to users data
-    setUsersData(prev => ({ ...prev, [newUser.id]: newUser }));
+  const login = async (email: string, password: string) => {
+  setIsLoading(true);
+
+  const res = await fetch(`${API_URL}/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (!res.ok) {
     setIsLoading(false);
-  }, []);
+    throw new Error("Invalid credentials");
+  }
+
+  const data = await res.json();
+
+  localStorage.setItem(TOKEN_KEY, data.access_token);
+  localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+
+  setUser(data.user);
+  setIsLoading(false);
+};
+
+
+
+  const logout = () => {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+  setUser(null);
+};
+
+
+  const signup = async (
+  email: string,
+  password: string,
+  name: string,
+  role: 'student' | 'teacher'
+) => {
+  setIsLoading(true);
+
+  const res = await fetch(`${API_URL}/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password, name, role }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    setIsLoading(false);
+    throw new Error(err.detail);
+  }
+
+  setIsLoading(false);
+};
+
 
   const approveTeacher = useCallback((teacherId: string) => {
     setUsersData(prev => {

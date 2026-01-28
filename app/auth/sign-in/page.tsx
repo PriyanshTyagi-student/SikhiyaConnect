@@ -86,6 +86,15 @@ export default function SignInPage() {
                 required
               />
             </div>
+            <div className="text-right">
+             <Link
+              href="/auth/forgot-password"
+              className="text-sm text-blue-600 hover:underline"
+             >
+             Forgot password?
+             </Link>
+            </div>
+
 
             <Button
               type="submit"
