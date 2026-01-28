@@ -22,7 +22,7 @@ export default function LandingPage() {
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">📚 Sikhiya Connect</div>
+          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">Sikhiya Connect</div>
           <nav className="hidden md:flex gap-6">
             <a href="#features" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100">Features</a>
             <a href="#community" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100">Community</a>
