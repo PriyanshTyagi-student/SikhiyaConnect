@@ -111,25 +111,6 @@ export default function SignInPage() {
               Sign up
             </Link>
           </p>
-
-          <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
-            <p className="text-xs text-slate-500 dark:text-slate-500 mb-3 font-semibold">Demo Credentials:</p>
-            <div className="space-y-2 text-xs">
-              <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded">
-                <p className="font-medium text-slate-900 dark:text-white">Student</p>
-                <p className="text-slate-600 dark:text-slate-400">priya@sikhiya.com</p>
-              </div>
-              <div className="p-2 bg-amber-100 dark:bg-amber-900/20 rounded">
-                <p className="font-medium text-slate-900 dark:text-white">Pending Teacher</p>
-                <p className="text-slate-600 dark:text-slate-400">aisha@sikhiya.com</p>
-                <p className="text-slate-600 dark:text-slate-400">vikram@sikhiya.com</p>
-              </div>
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded">
-                <p className="font-medium text-slate-900 dark:text-white">Admin</p>
-                <p className="text-slate-600 dark:text-slate-400">admin@sikhiya.com</p>
-              </div>
-            </div>
-          </div>
         </div>
       </Card>
     </div>
