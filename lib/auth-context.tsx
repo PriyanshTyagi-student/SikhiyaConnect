@@ -6,6 +6,7 @@ import { mockUsers } from './mock-data';
 
 interface AuthContextType {
   user: User | null;
+  token: string | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
@@ -16,11 +17,7 @@ interface AuthContextType {
   updateUser: (user: User) => void;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-if (!API_URL) {
-  throw new Error("NEXT_PUBLIC_API_URL is not defined");
-}
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://10.119.241.133:8000";
 
 const TOKEN_KEY = "sikhiya_token";
 const USER_KEY = "sikhiya_user";
@@ -30,14 +27,16 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [usersData, setUsersData] = useState<Record<string, User>>(mockUsers);
 
   React.useEffect(() => {
-  const token = localStorage.getItem(TOKEN_KEY);
+  const storedToken = localStorage.getItem(TOKEN_KEY);
   const savedUser = localStorage.getItem(USER_KEY);
 
-  if (token && savedUser) {
+  if (storedToken && savedUser) {
+    setToken(storedToken);
     setUser(JSON.parse(savedUser));
   }
 }, []);
@@ -61,6 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   localStorage.setItem(TOKEN_KEY, data.access_token);
   localStorage.setItem(USER_KEY, JSON.stringify(data.user));
 
+  setToken(data.access_token);
   setUser(data.user);
   setIsLoading(false);
 };
@@ -70,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
+  setToken(null);
   setUser(null);
 };
 
@@ -136,7 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout, signup, approveTeacher, rejectTeacher, getPendingTeachers, updateUser }}>
+    <AuthContext.Provider value={{ user, token, isLoading, login, logout, signup, approveTeacher, rejectTeacher, getPendingTeachers, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

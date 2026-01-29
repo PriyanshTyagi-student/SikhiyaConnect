@@ -13,8 +13,8 @@ import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 
 export default function SignInPage() {
-  const [email, setEmail] = useState('priya@sikhiya.com');
-  const [password, setPassword] = useState('password');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
@@ -129,7 +129,6 @@ export default function SignInPage() {
                 <p className="text-slate-600 dark:text-slate-400">admin@sikhiya.com</p>
               </div>
             </div>
-            <p className="text-xs text-slate-600 dark:text-slate-400 mt-2">Password: password (for all)</p>
           </div>
         </div>
       </Card>

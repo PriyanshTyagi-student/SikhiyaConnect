@@ -95,7 +95,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-slate-200 dark:border-slate-800 mt-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-slate-600 dark:text-slate-400">
-          <p>© 2024 Sikhiya Connect. All rights reserved.</p>
+          <p>© 2026 Sikhiya Connect. All rights reserved.</p>
         </div>
       </footer>
     </div>
