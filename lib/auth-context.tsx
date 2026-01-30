@@ -17,7 +17,7 @@ interface AuthContextType {
   updateUser: (user: User) => void;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://10.119.241.133:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://192.168.1.54:8000";
 
 const TOKEN_KEY = "sikhiya_token";
 const USER_KEY = "sikhiya_user";

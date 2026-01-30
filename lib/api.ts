@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://10.119.241.133:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://192.168.1.54:8000";
 
 export async function registerUser(
   name: string,
