@@ -11,13 +11,12 @@ import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { getStudentProfile } from '@/lib/student-profile';
 
 export default function SignInPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, setSession } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -26,25 +25,25 @@ export default function SignInPage() {
     setIsLoading(true);
 
     try {
+      // Otherwise, proceed with normal backend login
       await login(email, password);
       toast({
         title: 'Success',
         description: 'Signed in successfully!',
       });
+
+      const storedUser = localStorage.getItem('sikhiya_user');
+      const parsedUser = storedUser ? JSON.parse(storedUser) : null;
+
       // Route based on user role
-      const foundUser = email === 'admin@sikhiya.com';
-      if (foundUser) {
+      if (parsedUser?.role === 'admin') {
         router.push('/admin');
       } else if (email === 'aisha@sikhiya.com' || email === 'vikram@sikhiya.com') {
         // Pending teachers
         router.push('/teacher/pending');
       } else {
-        const profile = getStudentProfile(email);
-        if (!profile) {
-          router.push('/onboarding/student');
-        } else {
-          router.push('/dashboard');
-        }
+        // All other users (students and approved teachers) go to dashboard
+        router.push('/dashboard');
       }
     } catch (error) {
       toast({

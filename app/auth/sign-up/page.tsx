@@ -11,13 +11,33 @@ import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { getStudentProfile } from '@/lib/student-profile';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+const BOARDS = [
+  { value: 'PSEB', label: 'Punjab School Education Board (PSEB)' },
+  { value: 'CBSE', label: 'Central Board of Secondary Education (CBSE)' },
+  { value: 'ICSE', label: 'Indian Certificate of School Education (ICSE)' },
+  { value: 'Other', label: 'Other' },
+];
+
+const CLASSES = Array.from({ length: 12 }, (_, i) => ({
+  value: String(i + 1),
+  label: `Class ${i + 1}`,
+}));
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [role, setRole] = useState<'student' | 'teacher'>('student');
+  const [board, setBoard] = useState('');
+  const [studentClass, setStudentClass] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { signup } = useAuth();
   const router = useRouter();
@@ -25,10 +45,21 @@ export default function SignUpPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate student fields
+    if (role === 'student' && (!board || !studentClass)) {
+      toast({
+        title: 'Missing Information',
+        description: 'Please select your board and class',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      await signup(email, password, name, role);
+      await signup(email, password, name, role, board, studentClass);
       toast({
         title: 'Success',
         description: 'Account created successfully!',
@@ -37,12 +68,7 @@ export default function SignUpPage() {
       if (role === 'teacher') {
         router.push('/teacher/pending');
       } else {
-        const profile = getStudentProfile(email);
-        if (!profile) {
-          router.push('/onboarding/student');
-        } else {
-          router.push('/dashboard');
-        }
+        router.push('/dashboard');
       }
     } catch (error) {
       toast({
@@ -131,6 +157,42 @@ export default function SignUpPage() {
                 </label>
               </div>
             </div>
+
+            {role === 'student' && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="board">Board</Label>
+                  <Select value={board} onValueChange={setBoard} disabled={isLoading}>
+                    <SelectTrigger id="board">
+                      <SelectValue placeholder="Select your board" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {BOARDS.map((b) => (
+                        <SelectItem key={b.value} value={b.value}>
+                          {b.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="class">Class</Label>
+                  <Select value={studentClass} onValueChange={setStudentClass} disabled={isLoading}>
+                    <SelectTrigger id="class">
+                      <SelectValue placeholder="Select your class" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CLASSES.map((c) => (
+                        <SelectItem key={c.value} value={c.value}>
+                          {c.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </>
+            )}
 
             <Button
               type="submit"

@@ -12,16 +12,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Mail, User, BookOpen, Settings } from 'lucide-react';
 
 export default function ProfilePage() {
-  const { user } = useAuth();
+  const { user, isInitialized } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
+    if (!isInitialized) {
+      return;
+    }
+
     if (!user) {
       router.push('/auth/sign-in');
     }
-  }, [user, router]);
+  }, [user, isInitialized, router]);
 
-  if (!user) {
+  if (!isInitialized || !user) {
     return null;
   }
 

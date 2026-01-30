@@ -1,13 +1,20 @@
-let API_URL = process.env.NEXT_PUBLIC_API_URL || "http://192.168.1.54:8000";
+let API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 // Initialize API URL from discovery server on app startup
 export async function initializeAPI() {
   try {
-    // Try emulator first (Android emulator uses 10.0.2.2 to reach host)
-    let discoveryURL = "http://10.0.2.2:8001/ip";
-    let backupIP = "10.0.2.2";
+    // For development: try localhost first
+    let discoveryURL = "http://localhost:8001/ip";
+    let backupIP = "localhost";
     
     let response = await fetch(discoveryURL, { method: "GET" }).catch(() => null);
+    
+    // If localhost fails, try emulator IP (Android emulator uses 10.0.2.2 to reach host)
+    if (!response?.ok) {
+      discoveryURL = "http://10.0.2.2:8001/ip";
+      backupIP = "10.0.2.2";
+      response = await fetch(discoveryURL, { method: "GET" }).catch(() => null);
+    }
     
     // If emulator fails, try host machine IP
     if (!response?.ok) {
@@ -27,7 +34,7 @@ export async function initializeAPI() {
     }
   } catch (error) {
     console.log("⚠️ IP discovery error, using fallback");
-    API_URL = "http://192.168.1.54:8000";
+    API_URL = "http://localhost:8000";
   }
 }
 
@@ -62,6 +69,145 @@ export async function getDashboard(token: string) {
 
   if (!res.ok) {
     throw new Error("Failed to fetch dashboard data");
+  }
+
+  return res.json();
+}
+
+export async function getAdminStudents(token: string) {
+  const res = await fetch(`${getAPIURL()}/admin/students`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch students");
+  }
+
+  return res.json();
+}
+
+export async function getTeacherCourses(token: string) {
+  const res = await fetch(`${getAPIURL()}/teacher/courses`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch teacher courses");
+  }
+
+  return res.json();
+}
+
+export async function createTeacherCourse(
+  token: string,
+  payload: {
+    title: string;
+    description?: string;
+    level: 'beginner' | 'intermediate' | 'advanced';
+    duration: number;
+    thumbnail?: string;
+  }
+) {
+  const res = await fetch(`${getAPIURL()}/teacher/courses`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to create course");
+  }
+
+  return res.json();
+}
+
+export async function getAdminTeachers(token: string, status?: string) {
+  const query = status ? `?status=${encodeURIComponent(status)}` : '';
+  const res = await fetch(`${getAPIURL()}/admin/teachers${query}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch teachers");
+  }
+
+  return res.json();
+}
+
+export async function approveTeacherAdmin(token: string, teacherId: string) {
+  const res = await fetch(`${getAPIURL()}/admin/teachers/${teacherId}/approve`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to approve teacher");
+  }
+
+  return res.json();
+}
+
+export async function rejectTeacherAdmin(token: string, teacherId: string) {
+  const res = await fetch(`${getAPIURL()}/admin/teachers/${teacherId}/reject`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to reject teacher");
+  }
+
+  return res.json();
+}
+
+export async function deleteAdminUser(token: string, userId: string) {
+  const res = await fetch(`${getAPIURL()}/admin/users/${userId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to delete user");
+  }
+
+  return res.json();
+}
+
+export async function resetAdminUserPassword(token: string, userId: string) {
+  const res = await fetch(`${getAPIURL()}/admin/users/${userId}/reset-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to reset password");
   }
 
   return res.json();

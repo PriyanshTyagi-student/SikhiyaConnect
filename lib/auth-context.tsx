@@ -4,15 +4,16 @@ import React, { createContext, useContext, useState, useCallback, ReactNode } fr
 import { User } from './types';
 import { mockUsers } from './mock-data';
 import { getAPIURL } from './api';
-import { clearStudentProfile } from './student-profile';
 
 interface AuthContextType {
   user: User | null;
   token: string | null;
   isLoading: boolean;
+  isInitialized: boolean;
   login: (email: string, password: string) => Promise<void>;
+  setSession: (token: string, user: User) => void;
   logout: () => void;
-  signup: (email: string, password: string, name: string, role: 'student' | 'teacher') => Promise<void>;
+  signup: (email: string, password: string, name: string, role: 'student' | 'teacher', board?: string, student_class?: string) => Promise<void>;
   approveTeacher: (teacherId: string) => void;
   rejectTeacher: (teacherId: string) => void;
   getPendingTeachers: () => User[];
@@ -29,17 +30,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const [usersData, setUsersData] = useState<Record<string, User>>(mockUsers);
 
   React.useEffect(() => {
-  const storedToken = localStorage.getItem(TOKEN_KEY);
-  const savedUser = localStorage.getItem(USER_KEY);
+    const storedToken = localStorage.getItem(TOKEN_KEY);
+    const savedUser = localStorage.getItem(USER_KEY);
 
-  if (storedToken && savedUser) {
-    setToken(storedToken);
-    setUser(JSON.parse(savedUser));
-  }
-}, []);
+    if (storedToken && savedUser) {
+      setToken(storedToken);
+      setUser(JSON.parse(savedUser));
+    }
+    
+    setIsInitialized(true);
+  }, []);
 
   const login = async (email: string, password: string) => {
   setIsLoading(true);
@@ -65,12 +69,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   setIsLoading(false);
 };
 
+  const setSession = useCallback((sessionToken: string, sessionUser: User) => {
+    localStorage.setItem(TOKEN_KEY, sessionToken);
+    localStorage.setItem(USER_KEY, JSON.stringify(sessionUser));
+    setToken(sessionToken);
+    setUser(sessionUser);
+  }, []);
+
 
 
   const logout = () => {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
-  clearStudentProfile();
   setToken(null);
   setUser(null);
 };
@@ -80,23 +90,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   email: string,
   password: string,
   name: string,
-  role: 'student' | 'teacher'
+  role: 'student' | 'teacher',
+  board?: string,
+  student_class?: string
 ) => {
   setIsLoading(true);
 
-  const res = await fetch(`${getAPIURL()}/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password, name, role }),
-  });
+  try {
+    const res = await fetch(`${getAPIURL()}/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, name, role, board, student_class }),
+    });
 
-  if (!res.ok) {
-    const err = await res.json();
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail);
+    }
+
+    // After successful registration, automatically log the user in
+    await login(email, password);
+  } finally {
     setIsLoading(false);
-    throw new Error(err.detail);
   }
-
-  setIsLoading(false);
 };
 
 
@@ -138,7 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, logout, signup, approveTeacher, rejectTeacher, getPendingTeachers, updateUser }}>
+    <AuthContext.Provider value={{ user, token, isLoading, isInitialized, login, setSession, logout, signup, approveTeacher, rejectTeacher, getPendingTeachers, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

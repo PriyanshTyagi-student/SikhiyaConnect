@@ -11,11 +11,15 @@ import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, L
 import { TrendingUp, Users, BookOpen, Zap } from 'lucide-react';
 
 export default function AnalyticsPage() {
-  const { user } = useAuth();
+  const { user, isInitialized } = useAuth();
   const router = useRouter();
   const [analytics, setAnalytics] = useState<any>(null);
 
   useEffect(() => {
+    if (!isInitialized) {
+      return;
+    }
+
     if (!user) {
       router.push('/auth/sign-in');
       return;
@@ -26,9 +30,9 @@ export default function AnalyticsPage() {
     } else {
       setAnalytics(mockTeacherAnalytics);
     }
-  }, [user, router]);
+  }, [user, isInitialized, router]);
 
-  if (!user || !analytics) {
+  if (!isInitialized || !user || !analytics) {
     return null;
   }
 

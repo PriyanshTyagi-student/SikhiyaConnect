@@ -13,6 +13,9 @@ export interface User {
   teacherStatus?: TeacherStatus;
   bio?: string;
   qualifications?: string;
+  // Student fields
+  board?: string;
+  student_class?: string;
 }
 
 // Course types

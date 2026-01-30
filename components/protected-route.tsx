@@ -19,10 +19,14 @@ export function ProtectedRoute({
   requiredTeacherStatus = 'approved',
   fallbackRoute = '/',
 }: ProtectedRouteProps) {
-  const { user } = useAuth();
+  const { user, isInitialized } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
+    if (!isInitialized) {
+      return;
+    }
+
     if (!user) {
       router.push('/auth/sign-in');
       return;
@@ -41,9 +45,9 @@ export function ProtectedRoute({
       }
       return;
     }
-  }, [user, requiredRole, requiredTeacherStatus, router, fallbackRoute]);
+  }, [user, isInitialized, requiredRole, requiredTeacherStatus, router, fallbackRoute]);
 
-  if (!user) {
+  if (!isInitialized || !user) {
     return null;
   }
 

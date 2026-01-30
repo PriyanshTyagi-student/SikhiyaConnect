@@ -7,26 +7,31 @@ import { DashboardLayout } from '@/components/dashboard-layout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { mockCourses } from '@/lib/mock-data';
+import { mockCourses, getCoursesByBoardAndClass } from '@/lib/mock-data';
 import Link from 'next/link';
 import { Search, Users, Clock, TrendingUp } from 'lucide-react';
 
 export default function CoursesPage() {
-  const { user } = useAuth();
+  const { user, isInitialized } = useAuth();
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLevel, setSelectedLevel] = useState<'all' | 'beginner' | 'intermediate' | 'advanced'>('all');
   const [filteredCourses, setFilteredCourses] = useState(Object.values(mockCourses));
 
   useEffect(() => {
+    if (!isInitialized) {
+      return;
+    }
+
     if (!user) {
       router.push('/auth/sign-in');
       return;
     }
-  }, [user, router]);
+  }, [user, isInitialized, router]);
 
   useEffect(() => {
-    let filtered = Object.values(mockCourses);
+    // Start with courses available for this student's board and class
+    let filtered = getCoursesByBoardAndClass(user?.board, user?.student_class);
 
     // Filter by search term
     if (searchTerm) {
@@ -43,9 +48,9 @@ export default function CoursesPage() {
     }
 
     setFilteredCourses(filtered);
-  }, [searchTerm, selectedLevel]);
+  }, [searchTerm, selectedLevel, user?.board, user?.student_class]);
 
-  if (!user) {
+  if (!isInitialized || !user) {
     return null;
   }
 
@@ -69,6 +74,11 @@ export default function CoursesPage() {
         <div>
           <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">Explore Courses</h1>
           <p className="text-slate-600 dark:text-slate-400">Discover and enroll in amazing courses</p>
+          {user?.board && user?.student_class && (
+            <p className="text-sm text-slate-500 dark:text-slate-500 mt-2">
+              📚 {user.board} Board • Class {user.student_class} • {filteredCourses.length} courses available
+            </p>
+          )}
         </div>
 
         {/* Search and Filters */}

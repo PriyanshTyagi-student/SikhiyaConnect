@@ -8,10 +8,14 @@ import { AlertCircle, Clock, CheckCircle } from 'lucide-react';
 import { useEffect } from 'react';
 
 export default function TeacherPendingPage() {
-  const { user } = useAuth();
+  const { user, isInitialized } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
+    if (!isInitialized) {
+      return;
+    }
+
     // If user is not a teacher or status is not pending, redirect
     if (!user || user.role !== 'teacher') {
       router.push('/');
@@ -27,7 +31,7 @@ export default function TeacherPendingPage() {
       router.push('/');
       return;
     }
-  }, [user, router]);
+  }, [user, isInitialized, router]);
 
   const handleLogout = () => {
     router.push('/auth/sign-in');

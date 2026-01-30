@@ -277,3 +277,80 @@ export const mockTeacherAnalytics: TeacherAnalytics = {
     { day: 'Sun', hours: 3 },
   ],
 };
+
+// Course to Class/Board mapping
+export const coursesByClassAndBoard: Record<string, Record<string, string[]>> = {
+  // PSEB (Punjab School Education Board)
+  PSEB: {
+    '1': ['course1', 'course2'],  // Class 1: Math Basics, English Alphabet
+    '2': ['course1', 'course2', 'course3'],  // Class 2: Math, English, Science Basics
+    '3': ['course1', 'course2', 'course3', 'course4'],  // Class 3: Math, English, Science, Social Studies
+    '4': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '5': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '6': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '7': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '8': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '9': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '10': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '11': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '12': ['course1', 'course2', 'course3', 'course4', 'course5'],
+  },
+  // CBSE
+  CBSE: {
+    '1': ['course1', 'course2'],
+    '2': ['course1', 'course2', 'course3'],
+    '3': ['course1', 'course2', 'course3', 'course4'],
+    '4': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '5': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '6': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '7': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '8': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '9': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '10': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '11': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '12': ['course1', 'course2', 'course3', 'course4', 'course5'],
+  },
+  // ICSE
+  ICSE: {
+    '1': ['course1', 'course2'],
+    '2': ['course1', 'course2', 'course3'],
+    '3': ['course1', 'course2', 'course3', 'course4'],
+    '4': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '5': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '6': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '7': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '8': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '9': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '10': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '11': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '12': ['course1', 'course2', 'course3', 'course4', 'course5'],
+  },
+  // Other boards
+  Other: {
+    '1': ['course1', 'course2'],
+    '2': ['course1', 'course2', 'course3'],
+    '3': ['course1', 'course2', 'course3', 'course4'],
+    '4': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '5': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '6': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '7': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '8': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '9': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '10': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '11': ['course1', 'course2', 'course3', 'course4', 'course5'],
+    '12': ['course1', 'course2', 'course3', 'course4', 'course5'],
+  },
+};
+
+// Get courses for a specific board and class
+export function getCoursesByBoardAndClass(board?: string, studentClass?: string): Course[] {
+  if (!board || !studentClass) {
+    // If no board/class specified, return all courses
+    return Object.values(mockCourses);
+  }
+  
+  const courseIds = coursesByClassAndBoard[board]?.[studentClass] || [];
+  return courseIds
+    .map(id => mockCourses[id as keyof typeof mockCourses])
+    .filter(Boolean);
+}

@@ -12,7 +12,7 @@ import { mockDiscussions, mockCourses } from '@/lib/mock-data';
 import { MessageSquare, ThumbsUp, CheckCircle2, Plus, Search } from 'lucide-react';
 
 function DiscussionsContent() {
-  const { user } = useAuth();
+  const { user, isInitialized } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedId = searchParams.get('id');
@@ -24,6 +24,10 @@ function DiscussionsContent() {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
+    if (!isInitialized) {
+      return;
+    }
+
     if (!user) {
       router.push('/auth/sign-in');
       return;
@@ -35,7 +39,7 @@ function DiscussionsContent() {
         setSelectedDiscussion(discussion);
       }
     }
-  }, [user, router, selectedId]);
+  }, [user, isInitialized, router, selectedId]);
 
   useEffect(() => {
     let filtered = Object.values(mockDiscussions);
@@ -49,7 +53,7 @@ function DiscussionsContent() {
     setDiscussions(filtered);
   }, [searchTerm]);
 
-  if (!user) {
+  if (!isInitialized || !user) {
     return null;
   }
 

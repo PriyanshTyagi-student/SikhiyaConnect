@@ -8,24 +8,26 @@ import { DashboardLayout } from '@/components/dashboard-layout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { mockCourses, mockStudentAnalytics, mockDiscussions } from '@/lib/mock-data';
+import { mockCourses, mockStudentAnalytics, mockDiscussions, getCoursesByBoardAndClass } from '@/lib/mock-data';
 import { getDashboard } from '@/lib/api';
-import { getStudentProfile } from '@/lib/student-profile';
 import Link from 'next/link';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Flame, BookOpen, Users, BarChart3 } from 'lucide-react';
 
 export default function DashboardPage() {
-  const { user, token } = useAuth();
+  const { user, token, isInitialized } = useAuth();
   const { t } = useLanguage();
   const router = useRouter();
   const [enrolledCourses, setEnrolledCourses] = useState<typeof mockCourses>({});
   const [progress, setProgress] = useState<Record<string, number>>({});
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [profileChecked, setProfileChecked] = useState(false);
 
   useEffect(() => {
+    if (!isInitialized) {
+      return;
+    }
+
     if (!user) {
       router.push('/auth/sign-in');
       return;
@@ -36,18 +38,15 @@ export default function DashboardPage() {
       return;
     }
 
-    const profile = getStudentProfile(user.email);
-    if (!profile) {
-      router.push('/onboarding/student');
-      return;
-    }
-    setProfileChecked(true);
-
     // Fetch dashboard data from API
     if (token) {
       getDashboard(token)
         .then(data => {
           setDashboardData(data);
+          // Update progress from API data if available
+          if (data.courseProgress) {
+            setProgress(data.courseProgress);
+          }
           setLoading(false);
         })
         .catch(err => {
@@ -57,13 +56,19 @@ export default function DashboardPage() {
     }
   }, [user, token, router]);
 
-  if (!user || user.role !== 'student' || !profileChecked) {
+  if (!user || user.role !== 'student') {
     return null;
   }
 
-  const courseArray = Object.values(enrolledCourses);
+  // Get courses available for this student's board and class
+  const availableCourses = getCoursesByBoardAndClass(user.board, user.student_class);
+  
+  // Use dashboardData enrolled courses if available, otherwise show all available courses for their class
+  const courseArray = dashboardData?.enrolledCourses ? 
+    dashboardData.enrolledCourses.map((id: string) => mockCourses[id as keyof typeof mockCourses]).filter(Boolean) :
+    availableCourses;
   const recentDiscussions = Object.values(mockDiscussions).slice(0, 3);
-  const isEmpty = courseArray.length === 0 && !dashboardData;
+  const isEmpty = courseArray.length === 0;
   const stats = dashboardData?.stats || {
     coursesEnrolled: 0,
     hoursLearned: 0,
@@ -80,6 +85,11 @@ export default function DashboardPage() {
             {t('dashboard.welcome')}, {user.name.split(' ')[0]}! 👋
           </h1>
           <p className="text-slate-600 dark:text-slate-400">{t('dashboard.greeting')}</p>
+          {user.board && user.student_class && (
+            <p className="text-sm text-slate-500 dark:text-slate-500 mt-2">
+              📚 {user.board} Board • Class {user.student_class}
+            </p>
+          )}
         </div>
 
         {/* Stats Cards */}
