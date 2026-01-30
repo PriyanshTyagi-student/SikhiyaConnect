@@ -3,6 +3,8 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { User } from './types';
 import { mockUsers } from './mock-data';
+import { getAPIURL } from './api';
+import { clearStudentProfile } from './student-profile';
 
 interface AuthContextType {
   user: User | null;
@@ -16,8 +18,6 @@ interface AuthContextType {
   getPendingTeachers: () => User[];
   updateUser: (user: User) => void;
 }
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://192.168.1.54:8000";
 
 const TOKEN_KEY = "sikhiya_token";
 const USER_KEY = "sikhiya_user";
@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string) => {
   setIsLoading(true);
 
-  const res = await fetch(`${API_URL}/login`, {
+  const res = await fetch(`${getAPIURL()}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
@@ -70,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
+  clearStudentProfile();
   setToken(null);
   setUser(null);
 };
@@ -83,7 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 ) => {
   setIsLoading(true);
 
-  const res = await fetch(`${API_URL}/register`, {
+  const res = await fetch(`${getAPIURL()}/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password, name, role }),

@@ -7,12 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-if (!API_URL) {
-  throw new Error("NEXT_PUBLIC_API_URL is not defined");
-}
+import { getAPIURL } from "@/lib/api";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -30,17 +25,27 @@ export default function ForgotPasswordPage() {
       return;
     }
 
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast({
+        title: "Invalid email",
+        description: "Please enter a valid email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/forgot-password`, {
+      const res = await fetch(`${getAPIURL()}/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
 
       if (!res.ok) {
-        throw new Error("Failed to send OTP");
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.detail || "Failed to send OTP");
       }
 
       toast({

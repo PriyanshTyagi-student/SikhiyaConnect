@@ -208,7 +208,7 @@ export default function TeacherPendingPage() {
           <Button
             onClick={() => {
               // Refresh to check for updates
-              window.location.reload();
+              router.refresh();
             }}
           >
             Check Status

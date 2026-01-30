@@ -9,7 +9,9 @@
     "start": "next start"
   },
   "dependencies": {
+    "@capacitor-mlkit/translation": "^8.0.0",
     "@capacitor/android": "^8.0.2",
+    "@capacitor/app": "^8.0.0",
     "@capacitor/cli": "^8.0.2",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "1.2.2",

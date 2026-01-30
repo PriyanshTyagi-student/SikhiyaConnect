@@ -8,8 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+import { getAPIURL } from '@/lib/api';
 
 function VerifyOtpForm() {
   const [otp, setOtp] = useState('');
@@ -36,7 +35,7 @@ function VerifyOtpForm() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/verify-otp`, {
+      const response = await fetch(`${getAPIURL()}/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp }),
@@ -69,7 +68,7 @@ function VerifyOtpForm() {
     setIsResending(true);
 
     try {
-      const response = await fetch(`${API_URL}/forgot-password`, {
+      const response = await fetch(`${getAPIURL()}/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

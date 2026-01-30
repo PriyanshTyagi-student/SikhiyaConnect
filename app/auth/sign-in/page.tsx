@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
+import { getStudentProfile } from '@/lib/student-profile';
 
 export default function SignInPage() {
   const [email, setEmail] = useState('');
@@ -38,7 +39,12 @@ export default function SignInPage() {
         // Pending teachers
         router.push('/teacher/pending');
       } else {
-        router.push('/dashboard');
+        const profile = getStudentProfile(email);
+        if (!profile) {
+          router.push('/onboarding/student');
+        } else {
+          router.push('/dashboard');
+        }
       }
     } catch (error) {
       toast({

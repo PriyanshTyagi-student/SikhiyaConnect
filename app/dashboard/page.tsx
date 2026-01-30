@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { mockCourses, mockStudentAnalytics, mockDiscussions } from '@/lib/mock-data';
 import { getDashboard } from '@/lib/api';
+import { getStudentProfile } from '@/lib/student-profile';
 import Link from 'next/link';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Flame, BookOpen, Users, BarChart3 } from 'lucide-react';
@@ -22,6 +23,7 @@ export default function DashboardPage() {
   const [progress, setProgress] = useState<Record<string, number>>({});
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [profileChecked, setProfileChecked] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -34,6 +36,13 @@ export default function DashboardPage() {
       return;
     }
 
+    const profile = getStudentProfile(user.email);
+    if (!profile) {
+      router.push('/onboarding/student');
+      return;
+    }
+    setProfileChecked(true);
+
     // Fetch dashboard data from API
     if (token) {
       getDashboard(token)
@@ -43,26 +52,24 @@ export default function DashboardPage() {
         })
         .catch(err => {
           console.error('Failed to fetch dashboard:', err);
-          // Fall back to mock data
           setLoading(false);
-          setEnrolledCourses({
-            course1: mockCourses.course1,
-            course2: mockCourses.course2,
-          });
-          setProgress({
-            course1: 65,
-            course2: 30,
-          });
         });
     }
   }, [user, token, router]);
 
-  if (!user || user.role !== 'student') {
+  if (!user || user.role !== 'student' || !profileChecked) {
     return null;
   }
 
   const courseArray = Object.values(enrolledCourses);
   const recentDiscussions = Object.values(mockDiscussions).slice(0, 3);
+  const isEmpty = courseArray.length === 0 && !dashboardData;
+  const stats = dashboardData?.stats || {
+    coursesEnrolled: 0,
+    hoursLearned: 0,
+    currentStreak: 0,
+    completedCourses: 0,
+  };
 
   return (
     <DashboardLayout>
@@ -82,7 +89,7 @@ export default function DashboardPage() {
               <span className="text-slate-600 dark:text-slate-400 text-sm font-medium">{t('dashboard.coursesEnrolled')}</span>
               <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
-            <p className="text-3xl font-bold text-slate-900 dark:text-white">{courseArray.length}</p>
+            <p className="text-3xl font-bold text-slate-900 dark:text-white">{stats.coursesEnrolled}</p>
           </Card>
 
           <Card className="p-6 border-slate-200 dark:border-slate-800">
@@ -90,7 +97,7 @@ export default function DashboardPage() {
               <span className="text-slate-600 dark:text-slate-400 text-sm font-medium">{t('dashboard.hoursLearned')}</span>
               <BarChart3 className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             </div>
-            <p className="text-3xl font-bold text-slate-900 dark:text-white">{mockStudentAnalytics.totalHoursLearned}</p>
+            <p className="text-3xl font-bold text-slate-900 dark:text-white">{stats.hoursLearned}</p>
           </Card>
 
           <Card className="p-6 border-slate-200 dark:border-slate-800">
@@ -98,7 +105,7 @@ export default function DashboardPage() {
               <span className="text-slate-600 dark:text-slate-400 text-sm font-medium">{t('dashboard.currentStreak')}</span>
               <Flame className="w-5 h-5 text-amber-600 dark:text-amber-400" />
             </div>
-            <p className="text-3xl font-bold text-slate-900 dark:text-white">{mockStudentAnalytics.currentStreak}</p>
+            <p className="text-3xl font-bold text-slate-900 dark:text-white">{stats.currentStreak}</p>
             <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">days</p>
           </Card>
 
@@ -107,12 +114,27 @@ export default function DashboardPage() {
               <span className="text-slate-600 dark:text-slate-400 text-sm font-medium">{t('dashboard.completed')}</span>
               <Users className="w-5 h-5 text-green-600 dark:text-green-400" />
             </div>
-            <p className="text-3xl font-bold text-slate-900 dark:text-white">{mockStudentAnalytics.coursesCompleted}</p>
+            <p className="text-3xl font-bold text-slate-900 dark:text-white">{stats.completedCourses}</p>
           </Card>
         </div>
 
+        {isEmpty && !loading && (
+          <Card className="p-8 border-slate-200 dark:border-slate-800 text-center">
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Welcome to your new dashboard</h2>
+            <p className="text-slate-600 dark:text-slate-400 mt-2">
+              You don’t have any courses yet. Start by exploring available courses.
+            </p>
+            <div className="mt-6">
+              <Link href="/courses">
+                <Button>Explore Courses</Button>
+              </Link>
+            </div>
+          </Card>
+        )}
+
         {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-3 gap-8">
+        {!isEmpty && (
+          <div className="grid lg:grid-cols-3 gap-8">
           {/* Enrolled Courses */}
           <div className="lg:col-span-2 space-y-6">
             <div>
@@ -187,6 +209,7 @@ export default function DashboardPage() {
             </Card>
           </div>
         </div>
+        )}
       </div>
     </DashboardLayout>
   );

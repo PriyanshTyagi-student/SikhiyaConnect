@@ -8,8 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+import { getAPIURL } from '@/lib/api';
 
 function ResetPasswordForm() {
   const [newPassword, setNewPassword] = useState('');
@@ -55,7 +54,7 @@ function ResetPasswordForm() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/reset-password`, {
+      const response = await fetch(`${getAPIURL()}/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, new_password: newPassword }),
