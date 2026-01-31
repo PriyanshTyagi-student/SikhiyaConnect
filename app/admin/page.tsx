@@ -389,6 +389,22 @@ export default function AdminDashboard() {
                             <span className="inline-block px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-900 dark:text-green-100 text-xs font-medium rounded-full">
                               ✓ Approved
                             </span>
+                            <div className="mt-3 flex justify-end gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleResetPassword(String(teacher.id))}
+                              >
+                                Reset Password
+                              </Button>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleDeleteUser(String(teacher.id))}
+                              >
+                                Delete
+                              </Button>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -519,13 +535,13 @@ export default function AdminDashboard() {
                       <h4 className="font-semibold text-amber-900 dark:text-amber-100">Security Notice</h4>
                       <p className="text-sm text-amber-800 dark:text-amber-200 mt-1">
                         This is a development admin panel. For production use, implement proper:
-                        <ul className="list-disc ml-5 mt-2 space-y-1">
-                          <li>Two-factor authentication (2FA)</li>
-                          <li>Password hashing and salting</li>
-                          <li>Audit logging for all admin actions</li>
-                          <li>Role-based access control (RBAC)</li>
-                        </ul>
                       </p>
+                      <ul className="list-disc ml-5 mt-2 space-y-1 text-sm text-amber-800 dark:text-amber-200">
+                        <li>Two-factor authentication (2FA)</li>
+                        <li>Password hashing and salting</li>
+                        <li>Audit logging for all admin actions</li>
+                        <li>Role-based access control (RBAC)</li>
+                      </ul>
                     </div>
                   </div>
                 </Card>

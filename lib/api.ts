@@ -59,19 +59,43 @@ export async function registerUser(
 }
 
 export async function getDashboard(token: string) {
-  const res = await fetch(`${getAPIURL()}/dashboard`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
-    },
-  });
+  try {
+    const apiURL = getAPIURL();
+    console.log("🔍 Attempting to fetch dashboard from:", apiURL);
+    console.log("🔑 Using token:", token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
+    
+    const res = await fetch(`${apiURL}/dashboard`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch dashboard data");
+    console.log("📡 Dashboard response status:", res.status);
+
+    if (res.status === 401) {
+      // Token expired or invalid - clear local storage
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_user');
+        window.location.href = '/auth/sign-in';
+      }
+      throw new Error("Authentication expired. Please sign in again.");
+    }
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch dashboard data: ${res.status} ${res.statusText}`);
+    }
+
+    return res.json();
+  } catch (error) {
+    console.error("❌ Dashboard fetch error:", error);
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      throw new Error(`Cannot connect to backend server at ${getAPIURL()}. Please ensure the backend is running.`);
+    }
+    throw error;
   }
-
-  return res.json();
 }
 
 export async function getAdminStudents(token: string) {

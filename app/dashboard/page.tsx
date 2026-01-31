@@ -22,6 +22,7 @@ export default function DashboardPage() {
   const [progress, setProgress] = useState<Record<string, number>>({});
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isInitialized) {
@@ -48,13 +49,17 @@ export default function DashboardPage() {
             setProgress(data.courseProgress);
           }
           setLoading(false);
+          setError(null);
         })
         .catch(err => {
           console.error('Failed to fetch dashboard:', err);
+          setError(err.message || 'Failed to load dashboard data');
           setLoading(false);
         });
+    } else {
+      setLoading(false);
     }
-  }, [user, token, router]);
+  }, [user, token, router, isInitialized]);
 
   if (!user || user.role !== 'student') {
     return null;
@@ -79,6 +84,26 @@ export default function DashboardPage() {
   return (
     <DashboardLayout>
       <div className="space-y-8">
+        {/* Error Banner */}
+        {error && (
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 text-red-600 dark:text-red-400">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-sm font-medium text-red-800 dark:text-red-200">Connection Error</h3>
+                <p className="mt-1 text-sm text-red-700 dark:text-red-300">{error}</p>
+                <p className="mt-2 text-xs text-red-600 dark:text-red-400">
+                  Please make sure the backend server is running on port 8000.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Welcome Section with Stats */}
         <div>
           <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">
