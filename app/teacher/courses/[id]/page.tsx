@@ -84,7 +84,7 @@ export default function CourseDetailPage() {
         },
         body: JSON.stringify({
           ...formData,
-          duration_hours: parseInt(formData.duration_hours),
+          duration: parseInt(formData.duration_hours),
         }),
       });
 
