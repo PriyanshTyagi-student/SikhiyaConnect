@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Save, Trash2 } from 'lucide-react';
 import Link from 'next/link';
+import { getAPIURL } from '@/lib/api';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,23 +39,25 @@ export default function CourseDetailPage() {
       return;
     }
 
-    if (user.role !== 'teacher' || user.teacher_status !== 'approved') {
+    if (user.role !== 'teacher' || user.teacherStatus !== 'approved') {
       router.push('/dashboard');
       return;
     }
 
     // Fetch course details
     if (token) {
-      fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/teacher/courses/${courseId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-        .then(res => {
+      const fetchCourse = async () => {
+        try {
+          const apiUrl = getAPIURL();
+          const res = await fetch(`${apiUrl}/teacher/courses/${courseId}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+          
           if (!res.ok) throw new Error('Course not found');
-          return res.json();
-        })
-        .then(data => {
+          const data = await res.json();
+          
           setCourse(data);
           setFormData({
             title: data.title,
@@ -63,12 +66,13 @@ export default function CourseDetailPage() {
             duration_hours: data.duration_hours.toString(),
             thumbnail: data.thumbnail || '',
           });
-          setLoading(false);
-        })
-        .catch(err => {
+        } catch (err) {
           console.error('Failed to fetch course:', err);
+        } finally {
           setLoading(false);
-        });
+        }
+      };
+      fetchCourse();
     }
   }, [user, token, router, isInitialized, courseId]);
 
@@ -76,7 +80,8 @@ export default function CourseDetailPage() {
     if (!token) return;
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/teacher/courses/${courseId}`, {
+      const apiUrl = getAPIURL();
+      const res = await fetch(`${apiUrl}/teacher/courses/${courseId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -104,7 +109,8 @@ export default function CourseDetailPage() {
     if (!token || !confirm('Are you sure you want to delete this course?')) return;
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/teacher/courses/${courseId}`, {
+      const apiUrl = getAPIURL();
+      const res = await fetch(`${apiUrl}/teacher/courses/${courseId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -172,6 +178,11 @@ export default function CourseDetailPage() {
           <div className="flex gap-2">
             {!editing ? (
               <>
+                <Link href={`/teacher/courses/${courseId}/manage`}>
+                  <Button type="button" variant="outline" className="gap-2">
+                    📚 Manage Content
+                  </Button>
+                </Link>
                 <Button type="button" onClick={() => setEditing(true)} variant="outline">
                   Edit
                 </Button>

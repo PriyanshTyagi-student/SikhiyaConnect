@@ -49,6 +49,8 @@ export interface Course {
   thumbnail?: string;
   createdAt: Date;
   studentCount: number;
+  target_class?: string; // e.g., "1-5", "6-8", "9-10", "11-12", "All"
+  target_board?: string; // e.g., "PSEB", "CBSE", "ICSE", "All"
 }
 
 // Progress types

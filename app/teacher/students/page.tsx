@@ -7,6 +7,7 @@ import { DashboardLayout } from '@/components/dashboard-layout';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Users, Search, Mail, BookOpen } from 'lucide-react';
+import { getAPIURL } from '@/lib/api';
 
 interface Student {
   id: number;
@@ -33,14 +34,15 @@ export default function TeacherStudentsPage() {
       return;
     }
 
-    if (user.role !== 'teacher' || user.teacher_status !== 'approved') {
+    if (user.role !== 'teacher' || user.teacherStatus !== 'approved') {
       router.push('/dashboard');
       return;
     }
 
     // Fetch students enrolled in teacher's courses
     if (token) {
-      fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/teacher/students`, {
+      const apiUrl = getAPIURL();
+      fetch(`${apiUrl}/teacher/students`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },

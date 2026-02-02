@@ -8,8 +8,8 @@ import { DashboardLayout } from '@/components/dashboard-layout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { mockCourses, mockStudentAnalytics, mockDiscussions, getCoursesByBoardAndClass } from '@/lib/mock-data';
-import { getDashboard } from '@/lib/api';
+import { mockStudentAnalytics } from '@/lib/mock-data';
+import { getDashboard, getStudentEnrollments } from '@/lib/api';
 import Link from 'next/link';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Flame, BookOpen, Users, BarChart3 } from 'lucide-react';
@@ -18,7 +18,7 @@ export default function DashboardPage() {
   const { user, token, isInitialized } = useAuth();
   const { t } = useLanguage();
   const router = useRouter();
-  const [enrolledCourses, setEnrolledCourses] = useState<typeof mockCourses>({});
+  const [enrolledCourses, setEnrolledCourses] = useState<any[]>([]);
   const [progress, setProgress] = useState<Record<string, number>>({});
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -41,12 +41,18 @@ export default function DashboardPage() {
 
     // Fetch dashboard data from API
     if (token) {
-      getDashboard(token)
-        .then(data => {
-          setDashboardData(data);
+      Promise.all([getDashboard(token), getStudentEnrollments(token)])
+        .then(([dashData, enrollData]) => {
+          setDashboardData(dashData);
+          
+          // Use actual enrolled courses from API
+          if (enrollData?.courses && Array.isArray(enrollData.courses)) {
+            setEnrolledCourses(enrollData.courses);
+          }
+          
           // Update progress from API data if available
-          if (data.courseProgress) {
-            setProgress(data.courseProgress);
+          if (dashData?.courseProgress) {
+            setProgress(dashData.courseProgress);
           }
           setLoading(false);
           setError(null);
@@ -65,17 +71,11 @@ export default function DashboardPage() {
     return null;
   }
 
-  // Get courses available for this student's board and class
-  const availableCourses = getCoursesByBoardAndClass(user.board, user.student_class);
-  
-  // Use dashboardData enrolled courses if available, otherwise show all available courses for their class
-  const courseArray = dashboardData?.enrolledCourses ? 
-    dashboardData.enrolledCourses.map((id: string) => mockCourses[id as keyof typeof mockCourses]).filter(Boolean) :
-    availableCourses;
-  const recentDiscussions = Object.values(mockDiscussions).slice(0, 3);
+  // Use enrolled courses from API
+  const courseArray = enrolledCourses || [];
   const isEmpty = courseArray.length === 0;
   const stats = dashboardData?.stats || {
-    coursesEnrolled: 0,
+    coursesEnrolled: enrolledCourses.length,
     hoursLearned: 0,
     currentStreak: 0,
     completedCourses: 0,
@@ -222,24 +222,22 @@ export default function DashboardPage() {
               </ResponsiveContainer>
             </Card>
 
-            {/* Recent Discussions */}
+            {/* Quick Actions */}
             <Card className="p-6 border-slate-200 dark:border-slate-800">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('dashboard.recentQuestions')}</h3>
-                <Link href="/discussions">
-                  <Button variant="outline" size="sm">{t('dashboard.viewAll')}</Button>
-                </Link>
-              </div>
-
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Quick Actions</h3>
               <div className="space-y-3">
-                {recentDiscussions.map((discussion) => (
-                  <Link key={discussion.id} href={`/discussions?id=${discussion.id}`}>
-                    <div className="p-3 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer">
-                      <p className="text-sm font-medium text-slate-900 dark:text-white line-clamp-1">{discussion.title}</p>
-                      <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">{discussion.replies.length} {t('dashboard.replies')}</p>
-                    </div>
-                  </Link>
-                ))}
+                <Link href="/courses" className="block">
+                  <Button variant="outline" className="w-full justify-start">
+                    <BookOpen className="w-4 h-4 mr-2" />
+                    Explore More Courses
+                  </Button>
+                </Link>
+                <Link href="/discussions" className="block">
+                  <Button variant="outline" className="w-full justify-start">
+                    <Users className="w-4 h-4 mr-2" />
+                    Ask Questions
+                  </Button>
+                </Link>
               </div>
             </Card>
           </div>

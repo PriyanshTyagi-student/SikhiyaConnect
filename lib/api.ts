@@ -1,4 +1,4 @@
-let API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+let API_URL = "http://localhost:8000";
 
 // Initialize API URL from discovery server on app startup
 export async function initializeAPI() {
@@ -77,8 +77,8 @@ export async function getDashboard(token: string) {
     if (res.status === 401) {
       // Token expired or invalid - clear local storage
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('auth_user');
+        localStorage.removeItem('sikhiya_token');
+        localStorage.removeItem('sikhiya_user');
         window.location.href = '/auth/sign-in';
       }
       throw new Error("Authentication expired. Please sign in again.");
@@ -130,6 +130,22 @@ export async function getTeacherCourses(token: string) {
   return res.json();
 }
 
+export async function getTeacherDashboard(token: string) {
+  const res = await fetch(`${getAPIURL()}/teacher/dashboard`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch teacher dashboard");
+  }
+
+  return res.json();
+}
+
 export async function createTeacherCourse(
   token: string,
   payload: {
@@ -138,6 +154,8 @@ export async function createTeacherCourse(
     level: 'beginner' | 'intermediate' | 'advanced';
     duration: number;
     thumbnail?: string;
+    target_class?: string;
+    target_board?: string;
   }
 ) {
   const res = await fetch(`${getAPIURL()}/teacher/courses`, {
@@ -235,4 +253,194 @@ export async function resetAdminUserPassword(token: string, userId: string) {
   }
 
   return res.json();
+}
+
+// ==================== STUDENT ENDPOINTS ====================
+
+export async function getAvailableCourses(token: string) {
+  try {
+    const res = await fetch(`${getAPIURL()}/courses/available`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch available courses");
+    }
+
+    return res.json();
+  } catch (error) {
+    console.error("❌ Error fetching available courses:", error);
+    throw error;
+  }
+}
+
+export async function getStudentEnrollments(token: string) {
+  try {
+    const res = await fetch(`${getAPIURL()}/student/enrollments`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch enrollments");
+    }
+
+    return res.json();
+  } catch (error) {
+    console.error("❌ Error fetching enrollments:", error);
+    throw error;
+  }
+}
+
+export async function enrollInCourse(token: string, courseId: number) {
+  try {
+    const res = await fetch(`${getAPIURL()}/courses/${courseId}/enroll`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to enroll in course");
+    }
+
+    return res.json();
+  } catch (error) {
+    console.error("❌ Error enrolling in course:", error);
+    throw error;
+  }
+}
+
+export async function getCourseDetails(token: string, courseId: number) {
+  try {
+    const res = await fetch(`${getAPIURL()}/courses/${courseId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch course details");
+    }
+
+    return res.json();
+  } catch (error) {
+    console.error("❌ Error fetching course details:", error);
+    throw error;
+  }
+}
+
+export async function getCourseModules(token: string, courseId: number) {
+  try {
+    const res = await fetch(`${getAPIURL()}/teacher/courses/${courseId}/modules`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch course modules");
+    }
+
+    return res.json();
+  } catch (error) {
+    console.error("❌ Error fetching modules:", error);
+    throw error;
+  }
+}
+export async function unenrollFromCourse(token: string, courseId: number) {
+  try {
+    const res = await fetch(`${getAPIURL()}/courses/${courseId}/unenroll`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to unenroll from course");
+    }
+
+    return res.json();
+  } catch (error) {
+    console.error("❌ Error unenrolling from course:", error);
+    throw error;
+  }
+}
+
+export async function getEnrollmentRequests(token: string, courseId: number) {
+  try {
+    const res = await fetch(`${getAPIURL()}/teacher/courses/${courseId}/enrollment-requests`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch enrollment requests");
+    }
+
+    return res.json();
+  } catch (error) {
+    console.error("❌ Error fetching enrollment requests:", error);
+    throw error;
+  }
+}
+
+export async function approveEnrollment(token: string, courseId: number, enrollmentId: number) {
+  try {
+    const res = await fetch(`${getAPIURL()}/courses/${courseId}/enrollment/${enrollmentId}/approve`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to approve enrollment");
+    }
+
+    return res.json();
+  } catch (error) {
+    console.error("❌ Error approving enrollment:", error);
+    throw error;
+  }
+}
+
+export async function rejectEnrollment(token: string, courseId: number, enrollmentId: number) {
+  try {
+    const res = await fetch(`${getAPIURL()}/courses/${courseId}/enrollment/${enrollmentId}/reject`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to reject enrollment");
+    }
+
+    return res.json();
+  } catch (error) {
+    console.error("❌ Error rejecting enrollment:", error);
+    throw error;
+  }
 }

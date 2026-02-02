@@ -58,12 +58,20 @@ export default function SignInPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900 px-4">
-      <Card className="w-full max-w-md border-slate-200 dark:border-slate-800">
-        <div className="p-8">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Sikhiya Connect</h1>
-            <p className="text-slate-600 dark:text-slate-400">Welcome back! Sign in to continue.</p>
-          </div>
+      <div className="w-full max-w-md">
+        <Button
+          variant="outline"
+          className="mb-4"
+          onClick={() => router.push('/')}
+        >
+          ← Back to Home
+        </Button>
+        <Card className="border-slate-200 dark:border-slate-800">
+          <div className="p-8">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Sikhiya Connect</h1>
+              <p className="text-slate-600 dark:text-slate-400">Welcome back! Sign in to continue.</p>
+            </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
@@ -118,6 +126,7 @@ export default function SignInPage() {
           </p>
         </div>
       </Card>
+      </div>
     </div>
   );
 }
