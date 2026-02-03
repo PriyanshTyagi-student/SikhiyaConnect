@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from "react"
+import React, { useEffect, useRef } from "react"
 import { usePathname, useRouter } from 'next/navigation';
 import { initializeAPI } from "@/lib/api";
 import { TeacherApprovalListener } from './teacher-approval-listener';
@@ -8,10 +8,11 @@ import { TeacherApprovalListener } from './teacher-approval-listener';
 export function RootLayoutClient({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const initPromiseRef = useRef<Promise<void>>(Promise.resolve());
 
   useEffect(() => {
-    // Initialize API connection on app load
-    initializeAPI();
+    // Initialize API connection on app load and wait for it
+    initPromiseRef.current = initializeAPI();
   }, []);
 
   useEffect(() => {

@@ -7,7 +7,7 @@ import { DashboardLayout } from '@/components/dashboard-layout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { getAvailableCourses } from '@/lib/api';
+import { getAvailableCourses, waitForAPIInit } from '@/lib/api';
 import Link from 'next/link';
 import { Search, Users, Clock, TrendingUp, BookOpen } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -64,6 +64,10 @@ export default function CoursesPage() {
       try {
         setLoading(true);
         setError(null);
+        
+        // Wait for API to be initialized before fetching
+        await waitForAPIInit();
+        
         const data = await getAvailableCourses(token);
         setAllCourses(data.courses || []);
         setFilteredCourses(data.courses || []);

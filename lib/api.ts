@@ -1,45 +1,67 @@
 let API_URL = "http://localhost:8000";
+let initPromise: Promise<void> | null = null;
 
 // Initialize API URL from discovery server on app startup
 export async function initializeAPI() {
-  try {
-    // For development: try localhost first
-    let discoveryURL = "http://localhost:8001/ip";
-    let backupIP = "localhost";
-    
-    let response = await fetch(discoveryURL, { method: "GET" }).catch(() => null);
-    
-    // If localhost fails, try emulator IP (Android emulator uses 10.0.2.2 to reach host)
-    if (!response?.ok) {
-      discoveryURL = "http://10.0.2.2:8001/ip";
-      backupIP = "10.0.2.2";
-      response = await fetch(discoveryURL, { method: "GET" }).catch(() => null);
+  // Return existing promise if already initializing
+  if (initPromise) return initPromise;
+
+  initPromise = (async () => {
+    try {
+      // Get the current host's IP from window.location
+      if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        API_URL = `http://${window.location.hostname}:8000`;
+        console.log("✅ Using detected host IP:", window.location.hostname);
+        return;
+      }
+
+      // For development: try localhost first
+      let discoveryURL = "http://localhost:8001/ip";
+      let backupIP = "localhost";
+      
+      let response = await fetch(discoveryURL, { method: "GET" }).catch(() => null);
+      
+      // If localhost fails, try emulator IP (Android emulator uses 10.0.2.2 to reach host)
+      if (!response?.ok) {
+        discoveryURL = "http://10.0.2.2:8001/ip";
+        backupIP = "10.0.2.2";
+        response = await fetch(discoveryURL, { method: "GET" }).catch(() => null);
+      }
+      
+      // If emulator fails, try host machine IP
+      if (!response?.ok) {
+        discoveryURL = "http://192.168.1.54:8001/ip";
+        backupIP = "192.168.1.54";
+        response = await fetch(discoveryURL, { method: "GET" }).catch(() => null);
+      }
+      
+      if (response?.ok) {
+        const data = await response.json();
+        API_URL = `http://${data.ip}:8000`;
+        console.log("✅ Auto-discovered backend IP:", data.ip);
+      } else {
+        // Fallback: use backup IP
+        API_URL = `http://${backupIP}:8000`;
+        console.log("⚠️ Using fallback IP:", backupIP);
+      }
+    } catch (error) {
+      console.log("⚠️ IP discovery error, using fallback");
+      API_URL = "http://localhost:8000";
     }
-    
-    // If emulator fails, try host machine IP
-    if (!response?.ok) {
-      discoveryURL = "http://192.168.1.54:8001/ip";
-      backupIP = "192.168.1.54";
-      response = await fetch(discoveryURL, { method: "GET" }).catch(() => null);
-    }
-    
-    if (response?.ok) {
-      const data = await response.json();
-      API_URL = `http://${data.ip}:8000`;
-      console.log("✅ Auto-discovered backend IP:", data.ip);
-    } else {
-      // Fallback: use backup IP
-      API_URL = `http://${backupIP}:8000`;
-      console.log("⚠️ Using fallback IP:", backupIP);
-    }
-  } catch (error) {
-    console.log("⚠️ IP discovery error, using fallback");
-    API_URL = "http://localhost:8000";
-  }
+  })();
+
+  return initPromise;
 }
 
 export function getAPIURL() {
   return API_URL;
+}
+
+// Wait for API to be initialized
+export async function waitForAPIInit() {
+  if (initPromise) {
+    await initPromise;
+  }
 }
 
 export async function registerUser(

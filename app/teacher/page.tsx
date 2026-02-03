@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Users, BookOpen, TrendingUp, MessageSquare, Plus } from 'lucide-react';
-import { createTeacherCourse, getTeacherCourses, getTeacherDashboard } from '@/lib/api';
+import { createTeacherCourse, getTeacherCourses, getTeacherDashboard, waitForAPIInit } from '@/lib/api';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
@@ -63,6 +63,9 @@ export default function TeacherDashboardPage() {
 
     const loadCourses = async () => {
       try {
+        // Wait for API to be initialized
+        await waitForAPIInit();
+        
         const [coursesResult, dashboardResult] = await Promise.all([
           getTeacherCourses(token),
           getTeacherDashboard(token),

@@ -9,7 +9,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { mockStudentAnalytics } from '@/lib/mock-data';
-import { getDashboard, getStudentEnrollments } from '@/lib/api';
+import { getDashboard, getStudentEnrollments, waitForAPIInit } from '@/lib/api';
 import Link from 'next/link';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Flame, BookOpen, Users, BarChart3 } from 'lucide-react';
@@ -41,8 +41,16 @@ export default function DashboardPage() {
 
     // Fetch dashboard data from API
     if (token) {
-      Promise.all([getDashboard(token), getStudentEnrollments(token)])
-        .then(([dashData, enrollData]) => {
+      const fetchData = async () => {
+        try {
+          // Wait for API to be initialized
+          await waitForAPIInit();
+          
+          const [dashData, enrollData] = await Promise.all([
+            getDashboard(token),
+            getStudentEnrollments(token)
+          ]);
+          
           setDashboardData(dashData);
           
           // Use actual enrolled courses from API
@@ -56,12 +64,14 @@ export default function DashboardPage() {
           }
           setLoading(false);
           setError(null);
-        })
-        .catch(err => {
+        } catch (err) {
           console.error('Failed to fetch dashboard:', err);
-          setError(err.message || 'Failed to load dashboard data');
+          setError(err instanceof Error ? err.message : 'Failed to load dashboard data');
           setLoading(false);
-        });
+        }
+      };
+      
+      fetchData();
     } else {
       setLoading(false);
     }

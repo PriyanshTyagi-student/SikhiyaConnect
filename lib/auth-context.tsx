@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { User } from './types';
 import { mockUsers } from './mock-data';
-import { getAPIURL } from './api';
+import { getAPIURL, initializeAPI } from './api';
 
 interface AuthContextType {
   user: User | null;
@@ -34,15 +34,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [usersData, setUsersData] = useState<Record<string, User>>(mockUsers);
 
   React.useEffect(() => {
-    const storedToken = localStorage.getItem(TOKEN_KEY);
-    const savedUser = localStorage.getItem(USER_KEY);
+    const initialize = async () => {
+      // Ensure API is initialized before setting up auth
+      await initializeAPI();
+      
+      const storedToken = localStorage.getItem(TOKEN_KEY);
+      const savedUser = localStorage.getItem(USER_KEY);
 
-    if (storedToken && savedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(savedUser));
-    }
-    
-    setIsInitialized(true);
+      if (storedToken && savedUser) {
+        setToken(storedToken);
+        setUser(JSON.parse(savedUser));
+      }
+      
+      setIsInitialized(true);
+    };
+
+    initialize();
   }, []);
 
   const login = async (email: string, password: string) => {
