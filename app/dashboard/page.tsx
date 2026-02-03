@@ -116,62 +116,62 @@ export default function DashboardPage() {
 
         {/* Welcome Section with Stats */}
         <div>
-          <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-2">
             {t('dashboard.welcome')}, {user.name.split(' ')[0]}! 👋
           </h1>
-          <p className="text-slate-600 dark:text-slate-400">{t('dashboard.greeting')}</p>
+          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">{t('dashboard.greeting')}</p>
           {user.board && user.student_class && (
-            <p className="text-sm text-slate-500 dark:text-slate-500 mt-2">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-500 mt-2">
               📚 {user.board} Board • Class {user.student_class}
             </p>
           )}
         </div>
 
         {/* Stats Cards */}
-        <div className="grid md:grid-cols-4 gap-4">
-          <Card className="p-6 border-slate-200 dark:border-slate-800">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          <Card className="p-4 sm:p-6 border-slate-200 dark:border-slate-800">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-slate-600 dark:text-slate-400 text-sm font-medium">{t('dashboard.coursesEnrolled')}</span>
-              <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <span className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm font-medium">{t('dashboard.coursesEnrolled')}</span>
+              <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400" />
             </div>
-            <p className="text-3xl font-bold text-slate-900 dark:text-white">{stats.coursesEnrolled}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">{stats.coursesEnrolled}</p>
           </Card>
 
-          <Card className="p-6 border-slate-200 dark:border-slate-800">
+          <Card className="p-4 sm:p-6 border-slate-200 dark:border-slate-800">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-slate-600 dark:text-slate-400 text-sm font-medium">{t('dashboard.hoursLearned')}</span>
-              <BarChart3 className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              <span className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm font-medium">{t('dashboard.hoursLearned')}</span>
+              <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 dark:text-purple-400" />
             </div>
-            <p className="text-3xl font-bold text-slate-900 dark:text-white">{stats.hoursLearned}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">{stats.hoursLearned}</p>
           </Card>
 
-          <Card className="p-6 border-slate-200 dark:border-slate-800">
+          <Card className="p-4 sm:p-6 border-slate-200 dark:border-slate-800">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-slate-600 dark:text-slate-400 text-sm font-medium">{t('dashboard.currentStreak')}</span>
-              <Flame className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+              <span className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm font-medium">{t('dashboard.currentStreak')}</span>
+              <Flame className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 dark:text-amber-400" />
             </div>
-            <p className="text-3xl font-bold text-slate-900 dark:text-white">{stats.currentStreak}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">{stats.currentStreak}</p>
             <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">days</p>
           </Card>
 
-          <Card className="p-6 border-slate-200 dark:border-slate-800">
+          <Card className="p-4 sm:p-6 border-slate-200 dark:border-slate-800">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-slate-600 dark:text-slate-400 text-sm font-medium">{t('dashboard.completed')}</span>
-              <Users className="w-5 h-5 text-green-600 dark:text-green-400" />
+              <span className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm font-medium">{t('dashboard.completed')}</span>
+              <Users className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 dark:text-green-400" />
             </div>
-            <p className="text-3xl font-bold text-slate-900 dark:text-white">{stats.completedCourses}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">{stats.completedCourses}</p>
           </Card>
         </div>
 
         {isEmpty && !loading && (
-          <Card className="p-8 border-slate-200 dark:border-slate-800 text-center">
-            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Welcome to your new dashboard</h2>
-            <p className="text-slate-600 dark:text-slate-400 mt-2">
-              You don’t have any courses yet. Start by exploring available courses.
+          <Card className="p-6 sm:p-8 border-slate-200 dark:border-slate-800 text-center">
+            <h2 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white">Welcome to your new dashboard</h2>
+            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-2">
+              You don't have any courses yet. Start by exploring available courses.
             </p>
-            <div className="mt-6">
+            <div className="mt-4 sm:mt-6">
               <Link href="/courses">
-                <Button>Explore Courses</Button>
+                <Button className="w-full sm:w-auto">Explore Courses</Button>
               </Link>
             </div>
           </Card>

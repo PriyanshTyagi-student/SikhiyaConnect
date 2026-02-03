@@ -196,4 +196,42 @@ body {
   .animate-pulse-subtle {
     animation: pulse-subtle 2s ease-in-out infinite;
   }
+
+  /* Mobile-specific improvements */
+  @media (max-width: 768px) {
+    /* Larger touch targets */
+    button, a, input, select, textarea {
+      min-height: 44px;
+    }
+
+    /* Smooth scrolling on mobile */
+    * {
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Prevent text selection on buttons */
+    button {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    /* Optimize fonts for mobile */
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+  }
+
+  /* Prevent zoom on input focus for iOS */
+  @media (max-width: 768px) {
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="search"],
+    textarea,
+    select {
+      font-size: 16px !important;
+    }
+  }
 }

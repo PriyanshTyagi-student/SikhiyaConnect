@@ -5,8 +5,12 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev -H 0.0.0.0",
+    "dev:tunnel": "ngrok http 3000",
     "lint": "eslint .",
-    "start": "next start"
+    "start": "next start",
+    "export": "next build && next export",
+    "android:build": "npm run export && npx cap sync android && npx cap open android",
+    "android:release": "npm run export && npx cap sync android && cd android && .\\gradlew assembleRelease"
   },
   "dependencies": {
     "@capacitor-mlkit/translation": "^8.0.0",
@@ -69,6 +73,7 @@
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "ngrok": "^5.0.0-beta.2",
     "postcss": "^8.5",
     "tailwindcss": "^4.1.9",
     "tw-animate-css": "1.3.3",

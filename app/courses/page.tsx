@@ -160,9 +160,9 @@ export default function CoursesPage() {
 
         {/* Header */}
         <div>
-          <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">Explore Courses</h1>
-          <p className="text-slate-600 dark:text-slate-400">Discover and enroll in amazing courses</p>
-          <p className="text-sm text-slate-500 dark:text-slate-500 mt-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-2">Explore Courses</h1>
+          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">Discover and enroll in amazing courses</p>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-500 mt-2">
             📚 {filteredCourses.length} course{filteredCourses.length !== 1 ? 's' : ''} available for you
           </p>
         </div>
@@ -170,12 +170,12 @@ export default function CoursesPage() {
         {/* Search and Filters */}
         <div className="space-y-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
             <Input
-              placeholder="Search courses by title or topic..."
+              placeholder="Search courses..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-9 sm:pl-10 text-sm sm:text-base"
             />
           </div>
 
@@ -196,25 +196,25 @@ export default function CoursesPage() {
 
         {/* Courses Grid */}
         {filteredCourses.length > 0 ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {filteredCourses.map((course) => (
               <Link key={course.id} href={`/courses/${course.id}`}>
-                <Card className="h-full p-6 border-slate-200 dark:border-slate-800 hover:shadow-lg transition-shadow cursor-pointer flex flex-col">
-                  <div className="text-4xl mb-3">📚</div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 line-clamp-2">{course.title}</h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 line-clamp-3 flex-1">{course.description || 'No description available'}</p>
-                  <div className="space-y-3 mb-4 pb-4 border-b border-slate-200 dark:border-slate-700">
-                    <div className="flex items-center justify-between text-sm">
+                <Card className="h-full p-4 sm:p-6 border-slate-200 dark:border-slate-800 hover:shadow-lg transition-shadow cursor-pointer flex flex-col">
+                  <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">📚</div>
+                  <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mb-2 line-clamp-2">{course.title}</h3>
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mb-3 sm:mb-4 line-clamp-3 flex-1">{course.description || 'No description available'}</p>
+                  <div className="space-y-2 sm:space-y-3 mb-3 sm:mb-4 pb-3 sm:pb-4 border-b border-slate-200 dark:border-slate-700">
+                    <div className="flex items-center justify-between text-xs sm:text-sm">
                       <div className="flex items-center gap-1 text-slate-600 dark:text-slate-400">
-                        <Clock className="w-4 h-4" />
+                        <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
                         <span>{course.duration_hours}h</span>
                       </div>
                       <div className="flex items-center gap-1 text-slate-600 dark:text-slate-400">
                         <span className="text-xs">{course.target_class}</span>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${getLevelColor(course.level)}`}>
+                    <div className="flex items-center justify-between text-xs sm:text-sm">
+                      <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs font-semibold capitalize ${getLevelColor(course.level)}`}>
                         {course.level}
                       </span>
                       {course.target_board && (
