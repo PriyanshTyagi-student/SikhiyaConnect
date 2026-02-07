@@ -13,11 +13,13 @@ import { createTeacherCourse, getTeacherCourses, getTeacherDashboard, waitForAPI
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function TeacherDashboardPage() {
   const { user, token, isInitialized } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [teacherCourses, setTeacherCourses] = useState<any[]>([]);
   const [dashboardStats, setDashboardStats] = useState({
     totalCourses: 0,
@@ -471,15 +473,26 @@ export default function TeacherDashboardPage() {
             {/* Enrollment Trend */}
             <Card className="p-6 border-slate-200 dark:border-slate-800">
               <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Weekly Enrollments</h3>
-              <ResponsiveContainer width="100%" height={200}>
-                <LineChart data={dashboardStats.weeklyEnrollments}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.1} />
-                  <XAxis dataKey="day" stroke="currentColor" opacity={0.5} />
-                  <YAxis stroke="currentColor" opacity={0.5} />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="hours" stroke="#9333ea" strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
+              {isMobile ? (
+                <div className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+                  {dashboardStats.weeklyEnrollments.map((item) => (
+                    <div key={item.day} className="flex items-center justify-between">
+                      <span>{item.day}</span>
+                      <span className="font-semibold text-slate-900 dark:text-white">{item.hours}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart data={dashboardStats.weeklyEnrollments}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.1} />
+                    <XAxis dataKey="day" stroke="currentColor" opacity={0.5} />
+                    <YAxis stroke="currentColor" opacity={0.5} />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="hours" stroke="#9333ea" strokeWidth={2} isAnimationActive={!isMobile} />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
             </Card>
 
             {/* Student Questions */}

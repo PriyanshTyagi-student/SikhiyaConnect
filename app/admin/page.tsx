@@ -1,4 +1,6 @@
-'use client';
+"use client";
+
+export const dynamic = 'force-dynamic';
 
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
@@ -132,9 +134,10 @@ export default function AdminDashboard() {
         description: 'The user has been removed.',
       });
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to delete user.';
       toast({
         title: 'Error',
-        description: 'Failed to delete user.',
+        description: message,
         variant: 'destructive',
       });
     }

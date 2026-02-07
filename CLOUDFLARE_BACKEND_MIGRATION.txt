@@ -1,0 +1,100 @@
+Cloudflare Backend Migration (FastAPI → Workers + D1)
+
+Summary
+- Cloudflare Workers cannot run Python/FastAPI.
+- You must rewrite the backend in JS/TS and move data to D1 (SQLite).
+- This guide includes a working starter Worker and full migration steps.
+
+============================
+1) Create Cloudflare D1
+============================
+1. Go to Cloudflare Dashboard → Workers & Pages → D1.
+2. Create database: sikhiya_connect.
+3. Copy the database ID.
+4. Update: SikhiyaConnect/cloudflare-backend/wrangler.toml
+   database_id = "<ADD_YOUR_D1_DATABASE_ID>"
+
+============================
+2) Create the D1 schema
+============================
+1. Open: SikhiyaConnect/cloudflare-backend/schema.sql
+2. Apply schema:
+   wrangler d1 execute sikhiya_connect --file schema.sql
+
+============================
+3) Export data from Railway
+============================
+If Railway DB is MySQL:
+- Export with mysqldump.
+- Convert to SQLite (or use a migration tool).
+
+If Railway DB is Postgres:
+- Export with pg_dump.
+- Convert to SQLite.
+
+Simpler option:
+- Export tables to CSV and import into D1 with wrangler d1 execute
+  using INSERT statements.
+
+============================
+4) Deploy Worker Backend (starter)
+============================
+A starter Worker is in:
+- SikhiyaConnect/cloudflare-backend/worker.ts
+Includes:
+- /            (health)
+- /health      (health)
+- /register
+- /login
+- /me
+
+Deploy:
+1. cd SikhiyaConnect/cloudflare-backend
+2. wrangler login
+3. wrangler deploy
+
+============================
+5) Update App API URL
+============================
+Set the app API to the new Worker URL, e.g.
+- https://sikhiya-backend-worker.<your-subdomain>.workers.dev
+
+============================
+6) Port remaining routes
+============================
+You must rewrite all remaining FastAPI endpoints in worker.ts, including:
+- /dashboard
+- /admin/students
+- /admin/teachers
+- /admin/teachers/:id/approve
+- /admin/teachers/:id/reject
+- /admin/users/:id
+- /admin/users/:id/reset-password
+- /teacher/courses
+- /teacher/dashboard
+- /teacher/students
+- /teacher/courses/:id (CRUD)
+- /teacher/courses/:id/modules
+- /teacher/courses/:id/resources
+- /student/enrollments
+- /courses/available
+- /courses/:id
+- /courses/:id/enroll
+- /courses/:id/learn
+
+============================
+7) Passwords & JWT
+============================
+The worker uses PBKDF2 hashing and HS256 JWT.
+Set SECRET_KEY in wrangler.toml.
+
+============================
+8) What I already started
+============================
+Created:
+- SikhiyaConnect/cloudflare-backend/worker.ts
+- SikhiyaConnect/cloudflare-backend/schema.sql
+- SikhiyaConnect/cloudflare-backend/wrangler.toml
+
+Next
+- Tell me which endpoints you want me to port first.

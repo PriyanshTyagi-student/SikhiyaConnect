@@ -16,7 +16,7 @@ export default function SignInPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login, setSession } = useAuth();
+  const { login, refreshUser } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -26,21 +26,30 @@ export default function SignInPage() {
 
     try {
       // Otherwise, proceed with normal backend login
-      await login(email, password);
+      const sessionUser = await login(email, password);
+      const refreshedUser = await refreshUser().catch(() => null);
+      const activeUser = refreshedUser ?? sessionUser;
       toast({
         title: 'Success',
         description: 'Signed in successfully!',
       });
 
-      const storedUser = localStorage.getItem('sikhiya_user');
-      const parsedUser = storedUser ? JSON.parse(storedUser) : null;
+      if (!activeUser?.role) {
+        toast({
+          title: 'Session error',
+          description: 'User role not available after login. Please try again.',
+          variant: 'destructive',
+        });
+        return;
+      }
 
       // Route based on user role
-      if (parsedUser?.role === 'admin') {
+      if (activeUser?.role === 'admin') {
         router.push('/admin');
-      } else if (email === 'aisha@sikhiya.com' || email === 'vikram@sikhiya.com') {
-        // Pending teachers
+      } else if (activeUser?.role === 'teacher' && activeUser?.teacherStatus === 'pending') {
         router.push('/teacher/pending');
+      } else if (activeUser?.role === 'teacher') {
+        router.push('/teacher');
       } else {
         // All other users (students and approved teachers) go to dashboard
         router.push('/dashboard');
@@ -57,7 +66,7 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900 px-4">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <Button
           variant="outline"
@@ -66,11 +75,11 @@ export default function SignInPage() {
         >
           ← Back to Home
         </Button>
-        <Card className="border-slate-200 dark:border-slate-800">
+        <Card className="border-white/20">
           <div className="p-8">
             <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Sikhiya Connect</h1>
-              <p className="text-slate-600 dark:text-slate-400">Welcome back! Sign in to continue.</p>
+              <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-500 via-fuchsia-500 to-indigo-500 mb-2">Sikhiya Connect</h1>
+              <p className="text-foreground/70">Welcome back! Sign in to continue.</p>
             </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -102,7 +111,7 @@ export default function SignInPage() {
             <div className="text-right">
              <Link
               href="/auth/forgot-password"
-              className="text-sm text-blue-600 hover:underline"
+              className="text-sm text-foreground/70 hover:text-foreground underline-offset-4 hover:underline"
              >
              Forgot password?
              </Link>
@@ -118,9 +127,9 @@ export default function SignInPage() {
             </Button>
           </form>
 
-          <p className="text-center text-sm text-slate-600 dark:text-slate-400 mt-6">
+          <p className="text-center text-sm text-foreground/70 mt-6">
             Don't have an account?{' '}
-            <Link href="/auth/sign-up" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">
+            <Link href="/auth/sign-up" className="text-foreground hover:text-foreground underline-offset-4 hover:underline font-medium">
               Sign up
             </Link>
           </p>

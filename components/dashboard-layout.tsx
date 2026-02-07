@@ -40,11 +40,11 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       ];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+      <header className="sticky top-0 z-40 border-b border-white/20 bg-white/60 dark:bg-slate-950/60 backdrop-blur-xl shadow-[0_10px_30px_rgba(15,23,42,0.1)]">
         <div className="flex items-center justify-between px-3 sm:px-4 md:px-6 py-3 md:py-4 gap-2 md:gap-4">
-          <Link href="/dashboard" className="text-xl md:text-2xl font-bold text-blue-600 dark:text-blue-400 flex-shrink-0">
+          <Link href="/dashboard" className="text-xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-500 via-fuchsia-500 to-indigo-500 flex-shrink-0">
             📚
           </Link>
 
@@ -52,7 +52,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           <nav className="hidden md:flex gap-1">
             {navItems.map((item) => (
               <Link key={item.href} href={item.href}>
-                <Button variant="ghost" size="sm" className="text-slate-700 dark:text-slate-300 text-sm">
+                <Button variant="ghost" size="sm" className="text-foreground/80 hover:text-foreground text-sm">
                   {item.label}
                 </Button>
               </Link>
@@ -61,16 +61,16 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
           <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
             <div className="text-right hidden sm:block">
-              <p className="text-xs md:text-sm font-medium text-slate-900 dark:text-white truncate">{user?.name?.split(' ')[0]}</p>
+              <p className="text-xs md:text-sm font-medium text-foreground truncate">{user?.name?.split(' ')[0]}</p>
               <div className="flex items-center gap-2 justify-end">
-                <p className="text-xs text-slate-600 dark:text-slate-400 capitalize">{user?.role}</p>
+                <p className="text-xs text-foreground/70 capitalize">{user?.role}</p>
                 {user?.role === 'teacher' && user?.teacherStatus && (
                   <span className={`text-xs font-medium rounded-full px-2 py-0.5 ${
                     user.teacherStatus === 'approved'
-                      ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                      ? 'bg-emerald-100/80 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
                       : user.teacherStatus === 'pending'
-                      ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
-                      : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+                      ? 'bg-amber-100/80 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
+                      : 'bg-rose-100/80 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300'
                   }`}>
                     {user.teacherStatus.charAt(0).toUpperCase() + user.teacherStatus.slice(1)}
                   </span>
@@ -79,14 +79,14 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             </div>
             <LanguageSelector />
             <ThemeToggle />
-            <Button variant="outline" size="sm" onClick={handleLogout} className="gap-2 bg-transparent text-xs md:text-sm px-2 md:px-3">
+            <Button variant="outline" size="sm" onClick={handleLogout} className="gap-2 text-xs md:text-sm px-2 md:px-3">
               <LogOut className="w-3 h-3 md:w-4 md:h-4" />
               <span className="hidden sm:inline">Logout</span>
             </Button>
 
             {/* Mobile Menu Button */}
             <button
-              className="md:hidden p-1"
+              className="md:hidden p-1 text-foreground/80"
               onClick={() => setSidebarOpen(!sidebarOpen)}
             >
               {sidebarOpen ? (
@@ -100,13 +100,13 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
         {/* Mobile Nav */}
         {sidebarOpen && (
-          <div className="md:hidden border-t border-slate-200 dark:border-slate-800 p-4 flex flex-col gap-2">
+          <div className="md:hidden border-t border-white/15 p-4 flex flex-col gap-2 bg-white/40 dark:bg-slate-950/40 backdrop-blur-xl">
             {navItems.map((item) => (
               <Link key={item.href} href={item.href}>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="w-full justify-start text-slate-700 dark:text-slate-300"
+                  className="w-full justify-start text-foreground/80 hover:text-foreground"
                   onClick={() => setSidebarOpen(false)}
                 >
                   {item.label}

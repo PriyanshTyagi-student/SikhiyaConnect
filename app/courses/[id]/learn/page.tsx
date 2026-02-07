@@ -1,11 +1,12 @@
-'use client';
+import LessonPageClient from './LessonPageClient';
+import { mockCourses } from '@/lib/mock-data';
 
-import { useParams } from 'next/navigation';
-import LessonClient from './LessonClient';
+export async function generateStaticParams() {
+  return Object.keys(mockCourses).map((id) => ({ id }));
+}
+
+export const dynamicParams = false;
 
 export default function LessonPage() {
-  const params = useParams();
-  const courseId = params?.id as string;
-
-  return <LessonClient courseId={courseId} />;
+  return <LessonPageClient />;
 }

@@ -1,5 +1,40 @@
-let API_URL = "http://localhost:8000";
+const DEFAULT_API_URL = "https://sikhiya-backend-worker.sikhiyaconnect.workers.dev";
+const API_OVERRIDE_KEY = "sikhiya_api_url_override";
+let API_URL = DEFAULT_API_URL;
 let initPromise: Promise<void> | null = null;
+
+type FetchFn = typeof globalThis.fetch;
+
+const baseFetch: FetchFn = (...args: Parameters<FetchFn>) => globalThis.fetch(...args);
+const fetchNoCache: FetchFn = (input: Parameters<FetchFn>[0], init: Parameters<FetchFn>[1] = {}) =>
+  baseFetch(input, { ...init, cache: "no-store" });
+const fetch: FetchFn = fetchNoCache;
+
+function normalizeApiUrl(url: string) {
+  if (!url) return "";
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  return `https://${url}`;
+}
+
+function getStoredApiOverride(): string | null {
+  if (typeof window === "undefined") return null;
+  const stored = localStorage.getItem(API_OVERRIDE_KEY);
+  return stored ? normalizeApiUrl(stored) : null;
+}
+
+export function setAPIURLOverride(url: string) {
+  if (typeof window === "undefined") return;
+  const normalized = normalizeApiUrl(url);
+  if (!normalized) return;
+  localStorage.setItem(API_OVERRIDE_KEY, normalized);
+  API_URL = normalized;
+}
+
+export function clearAPIURLOverride() {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(API_OVERRIDE_KEY);
+  API_URL = DEFAULT_API_URL;
+}
 
 // Initialize API URL from discovery server on app startup
 export async function initializeAPI() {
@@ -7,61 +42,20 @@ export async function initializeAPI() {
   if (initPromise) return initPromise;
 
   initPromise = (async () => {
-    try {
-      // Check for production environment variable first
-      if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_API_URL) {
-        API_URL = process.env.NEXT_PUBLIC_API_URL;
-        console.log("✅ Using production API URL:", API_URL);
-        return;
-      }
-
-      // Get the current host's IP from window.location
-      if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-        API_URL = `http://${window.location.hostname}:8000`;
-        console.log("✅ Using detected host IP:", window.location.hostname);
-        return;
-      }
-
-      // For development: try localhost first
-      let discoveryURL = "http://localhost:8001/ip";
-      let backupIP = "localhost";
-      
-      let response = await fetch(discoveryURL, { method: "GET" }).catch(() => null);
-      
-      // If localhost fails, try emulator IP (Android emulator uses 10.0.2.2 to reach host)
-      if (!response?.ok) {
-        discoveryURL = "http://10.0.2.2:8001/ip";
-        backupIP = "10.0.2.2";
-        response = await fetch(discoveryURL, { method: "GET" }).catch(() => null);
-      }
-      
-      // If emulator fails, try host machine IP
-      if (!response?.ok) {
-        discoveryURL = "http://192.168.1.54:8001/ip";
-        backupIP = "192.168.1.54";
-        response = await fetch(discoveryURL, { method: "GET" }).catch(() => null);
-      }
-      
-      if (response?.ok) {
-        const data = await response.json();
-        API_URL = `http://${data.ip}:8000`;
-        console.log("✅ Auto-discovered backend IP:", data.ip);
-      } else {
-        // Fallback: use backup IP
-        API_URL = `http://${backupIP}:8000`;
-        console.log("⚠️ Using fallback IP:", backupIP);
-      }
-    } catch (error) {
-      console.log("⚠️ IP discovery error, using fallback");
-      API_URL = "http://localhost:8000";
+    const override = getStoredApiOverride();
+    if (override) {
+      API_URL = override;
+      console.log("✅ Using API override:", API_URL);
+      return;
     }
+    console.log("✅ Using default API URL:", DEFAULT_API_URL);
   })();
 
   return initPromise;
 }
 
 export function getAPIURL() {
-  return API_URL;
+  return getStoredApiOverride() ?? API_URL;
 }
 
 // Wait for API to be initialized
@@ -83,6 +77,22 @@ export async function registerUser(
     },
     body: JSON.stringify({ name, email, password }),
   });
+
+  return res.json();
+}
+
+export async function getCurrentUser(token: string) {
+  const res = await fetch(`${getAPIURL()}/me`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch current user (${res.status})`);
+  }
 
   return res.json();
 }
@@ -262,7 +272,9 @@ export async function deleteAdminUser(token: string, userId: string) {
   });
 
   if (!res.ok) {
-    throw new Error("Failed to delete user");
+    const err = await res.json().catch(() => null);
+    const message = err?.detail || `Failed to delete user (${res.status})`;
+    throw new Error(message);
   }
 
   return res.json();

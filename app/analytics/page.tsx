@@ -9,11 +9,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { mockStudentAnalytics, mockTeacherAnalytics } from '@/lib/mock-data';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { TrendingUp, Users, BookOpen, Zap } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function AnalyticsPage() {
   const { user, isInitialized } = useAuth();
   const router = useRouter();
   const [analytics, setAnalytics] = useState<any>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (!isInitialized) {
@@ -168,23 +170,35 @@ export default function AnalyticsPage() {
               <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6">
                 {isStudent ? 'Weekly Learning Hours' : 'Weekly Enrollments'}
               </h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={isStudent ? mockStudentAnalytics.weeklyData : mockTeacherAnalytics.weeklyEnrollments}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.1} />
-                  <XAxis dataKey="day" stroke="currentColor" opacity={0.5} />
-                  <YAxis stroke="currentColor" opacity={0.5} />
-                  <Tooltip />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="hours"
-                    stroke="#3b82f6"
-                    strokeWidth={2}
-                    name={isStudent ? 'Hours Learned' : 'New Enrollments'}
-                    dot={{ fill: '#3b82f6', r: 4 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              {isMobile ? (
+                <div className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+                  {(isStudent ? mockStudentAnalytics.weeklyData : mockTeacherAnalytics.weeklyEnrollments).map((item) => (
+                    <div key={item.day} className="flex items-center justify-between">
+                      <span>{item.day}</span>
+                      <span className="font-semibold text-slate-900 dark:text-white">{item.hours}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={isStudent ? mockStudentAnalytics.weeklyData : mockTeacherAnalytics.weeklyEnrollments}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.1} />
+                    <XAxis dataKey="day" stroke="currentColor" opacity={0.5} />
+                    <YAxis stroke="currentColor" opacity={0.5} />
+                    <Tooltip />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="hours"
+                      stroke="#3b82f6"
+                      strokeWidth={2}
+                      name={isStudent ? 'Hours Learned' : 'New Enrollments'}
+                      dot={{ fill: '#3b82f6', r: 4 }}
+                      isAnimationActive={!isMobile}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
             </Card>
           </TabsContent>
 
@@ -193,17 +207,28 @@ export default function AnalyticsPage() {
               <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6">
                 {isStudent ? 'Course Status' : 'Course Status'}
               </h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie data={pieData} cx="50%" cy="50%" labelLine={false} label dataKey="value">
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
+              {isMobile ? (
+                <div className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+                  {pieData.map((entry) => (
+                    <div key={entry.name} className="flex items-center justify-between">
+                      <span>{entry.name}</span>
+                      <span className="font-semibold text-slate-900 dark:text-white">{entry.value}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie data={pieData} cx="50%" cy="50%" labelLine={false} label dataKey="value" isAnimationActive={!isMobile}>
+                      {pieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
             </Card>
           </TabsContent>
 
@@ -212,21 +237,36 @@ export default function AnalyticsPage() {
               <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6">
                 {isStudent ? 'Time by Course' : 'Students by Course'}
               </h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart
-                  data={[
+              {isMobile ? (
+                <div className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+                  {[
                     { name: 'Web Development', value: isStudent ? 12 : 342 },
                     { name: 'React Mastery', value: isStudent ? 8 : 156 },
                     { name: 'DSA', value: isStudent ? 14 : 289 },
-                  ]}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.1} />
-                  <XAxis dataKey="name" stroke="currentColor" opacity={0.5} />
-                  <YAxis stroke="currentColor" opacity={0.5} />
-                  <Tooltip />
-                  <Bar dataKey="value" fill="#8b5cf6" name={isStudent ? 'Hours' : 'Students'} />
-                </BarChart>
-              </ResponsiveContainer>
+                  ].map((entry) => (
+                    <div key={entry.name} className="flex items-center justify-between">
+                      <span>{entry.name}</span>
+                      <span className="font-semibold text-slate-900 dark:text-white">{entry.value}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart
+                    data={[
+                      { name: 'Web Development', value: isStudent ? 12 : 342 },
+                      { name: 'React Mastery', value: isStudent ? 8 : 156 },
+                      { name: 'DSA', value: isStudent ? 14 : 289 },
+                    ]}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.1} />
+                    <XAxis dataKey="name" stroke="currentColor" opacity={0.5} />
+                    <YAxis stroke="currentColor" opacity={0.5} />
+                    <Tooltip />
+                    <Bar dataKey="value" fill="#8b5cf6" name={isStudent ? 'Hours' : 'Students'} isAnimationActive={!isMobile} />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
             </Card>
           </TabsContent>
         </Tabs>

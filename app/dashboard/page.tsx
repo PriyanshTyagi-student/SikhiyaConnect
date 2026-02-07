@@ -13,11 +13,13 @@ import { getDashboard, getStudentEnrollments, waitForAPIInit } from '@/lib/api';
 import Link from 'next/link';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Flame, BookOpen, Users, BarChart3 } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function DashboardPage() {
   const { user, token, isInitialized } = useAuth();
   const { t } = useLanguage();
   const router = useRouter();
+  const isMobile = useIsMobile();
   const [enrolledCourses, setEnrolledCourses] = useState<any[]>([]);
   const [progress, setProgress] = useState<Record<string, number>>({});
   const [dashboardData, setDashboardData] = useState<any>(null);
@@ -116,12 +118,12 @@ export default function DashboardPage() {
 
         {/* Welcome Section with Stats */}
         <div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">
             {t('dashboard.welcome')}, {user.name.split(' ')[0]}! 👋
           </h1>
-          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">{t('dashboard.greeting')}</p>
+          <p className="text-sm sm:text-base text-foreground/70">{t('dashboard.greeting')}</p>
           {user.board && user.student_class && (
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-500 mt-2">
+            <p className="text-xs sm:text-sm text-foreground/60 mt-2">
               📚 {user.board} Board • Class {user.student_class}
             </p>
           )}
@@ -129,44 +131,44 @@ export default function DashboardPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-          <Card className="p-4 sm:p-6 border-slate-200 dark:border-slate-800">
+          <Card className="p-4 sm:p-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm font-medium">{t('dashboard.coursesEnrolled')}</span>
-              <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400" />
+              <span className="text-foreground/70 text-xs sm:text-sm font-medium">{t('dashboard.coursesEnrolled')}</span>
+              <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-violet-500" />
             </div>
-            <p className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">{stats.coursesEnrolled}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-foreground">{stats.coursesEnrolled}</p>
           </Card>
 
-          <Card className="p-4 sm:p-6 border-slate-200 dark:border-slate-800">
+          <Card className="p-4 sm:p-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm font-medium">{t('dashboard.hoursLearned')}</span>
-              <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 dark:text-purple-400" />
+              <span className="text-foreground/70 text-xs sm:text-sm font-medium">{t('dashboard.hoursLearned')}</span>
+              <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-fuchsia-500" />
             </div>
-            <p className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">{stats.hoursLearned}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-foreground">{stats.hoursLearned}</p>
           </Card>
 
-          <Card className="p-4 sm:p-6 border-slate-200 dark:border-slate-800">
+          <Card className="p-4 sm:p-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm font-medium">{t('dashboard.currentStreak')}</span>
-              <Flame className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 dark:text-amber-400" />
+              <span className="text-foreground/70 text-xs sm:text-sm font-medium">{t('dashboard.currentStreak')}</span>
+              <Flame className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
             </div>
-            <p className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">{stats.currentStreak}</p>
-            <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">days</p>
+            <p className="text-2xl sm:text-3xl font-bold text-foreground">{stats.currentStreak}</p>
+            <p className="text-xs text-foreground/60 mt-1">days</p>
           </Card>
 
-          <Card className="p-4 sm:p-6 border-slate-200 dark:border-slate-800">
+          <Card className="p-4 sm:p-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm font-medium">{t('dashboard.completed')}</span>
-              <Users className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 dark:text-green-400" />
+              <span className="text-foreground/70 text-xs sm:text-sm font-medium">{t('dashboard.completed')}</span>
+              <Users className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500" />
             </div>
-            <p className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">{stats.completedCourses}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-foreground">{stats.completedCourses}</p>
           </Card>
         </div>
 
         {isEmpty && !loading && (
-          <Card className="p-6 sm:p-8 border-slate-200 dark:border-slate-800 text-center">
-            <h2 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white">Welcome to your new dashboard</h2>
-            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-2">
+          <Card className="p-6 sm:p-8 text-center">
+            <h2 className="text-lg sm:text-xl font-semibold text-foreground">Welcome to your new dashboard</h2>
+            <p className="text-sm sm:text-base text-foreground/70 mt-2">
               You don't have any courses yet. Start by exploring available courses.
             </p>
             <div className="mt-4 sm:mt-6">
@@ -184,7 +186,7 @@ export default function DashboardPage() {
           <div className="lg:col-span-2 space-y-6">
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{t('dashboard.myCourses')}</h2>
+                <h2 className="text-2xl font-bold text-foreground">{t('dashboard.myCourses')}</h2>
                 <Link href="/courses">
                   <Button variant="outline" size="sm">{t('dashboard.viewAll')}</Button>
                 </Link>
@@ -193,16 +195,16 @@ export default function DashboardPage() {
               <div className="space-y-4">
                 {courseArray.map((course) => (
                   <Link key={course.id} href={`/courses/${course.id}`}>
-                    <Card className="p-6 border-slate-200 dark:border-slate-800 hover:shadow-md transition-shadow cursor-pointer">
+                    <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
                       <div className="flex items-start gap-4">
                         <div className="text-4xl">{course.thumbnail || '📚'}</div>
                         <div className="flex-1">
-                          <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">{course.title}</h3>
-                          <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">{course.description}</p>
+                          <h3 className="text-lg font-bold text-foreground mb-1">{course.title}</h3>
+                          <p className="text-sm text-foreground/70 mb-3">{course.description}</p>
                           <div className="space-y-2">
                             <div className="flex items-center justify-between text-sm">
-                              <span className="text-slate-600 dark:text-slate-400">{t('dashboard.progress')}</span>
-                              <span className="font-semibold text-slate-900 dark:text-white">{progress[course.id]}%</span>
+                              <span className="text-foreground/70">{t('dashboard.progress')}</span>
+                              <span className="font-semibold text-foreground">{progress[course.id]}%</span>
                             </div>
                             <Progress value={progress[course.id] || 0} className="h-2" />
                           </div>
@@ -219,22 +221,33 @@ export default function DashboardPage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Learning Chart */}
-            <Card className="p-6 border-slate-200 dark:border-slate-800">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">{t('dashboard.weeklyActivity')}</h3>
-              <ResponsiveContainer width="100%" height={200}>
-                <LineChart data={mockStudentAnalytics.weeklyData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.1} />
-                  <XAxis dataKey="day" stroke="currentColor" opacity={0.5} />
-                  <YAxis stroke="currentColor" opacity={0.5} />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="hours" stroke="#2563eb" strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
+            <Card className="p-6">
+              <h3 className="text-lg font-bold text-foreground mb-4">{t('dashboard.weeklyActivity')}</h3>
+              {isMobile ? (
+                <div className="space-y-2 text-sm text-foreground/70">
+                  {mockStudentAnalytics.weeklyData.map((item) => (
+                    <div key={item.day} className="flex items-center justify-between">
+                      <span>{item.day}</span>
+                      <span className="font-semibold text-foreground">{item.hours}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart data={mockStudentAnalytics.weeklyData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.1} />
+                    <XAxis dataKey="day" stroke="currentColor" opacity={0.5} />
+                    <YAxis stroke="currentColor" opacity={0.5} />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="hours" stroke="#2563eb" strokeWidth={2} isAnimationActive={!isMobile} />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
             </Card>
 
             {/* Quick Actions */}
-            <Card className="p-6 border-slate-200 dark:border-slate-800">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Quick Actions</h3>
+            <Card className="p-6">
+              <h3 className="text-lg font-bold text-foreground mb-4">Quick Actions</h3>
               <div className="space-y-3">
                 <Link href="/courses" className="block">
                   <Button variant="outline" className="w-full justify-start">

@@ -117,8 +117,8 @@ export default function CoursesPage() {
       <DashboardLayout>
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <p className="mt-4 text-slate-600 dark:text-slate-400">Loading courses...</p>
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-violet-500"></div>
+            <p className="mt-4 text-foreground/70">Loading courses...</p>
           </div>
         </div>
       </DashboardLayout>
@@ -128,13 +128,13 @@ export default function CoursesPage() {
   const getLevelColor = (level: string) => {
     switch (level) {
       case 'beginner':
-        return 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300';
+        return 'bg-emerald-100/80 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300';
       case 'intermediate':
-        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300';
+        return 'bg-sky-100/80 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300';
       case 'advanced':
-        return 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300';
+        return 'bg-fuchsia-100/80 dark:bg-fuchsia-900/30 text-fuchsia-700 dark:text-fuchsia-300';
       default:
-        return 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300';
+        return 'bg-white/60 dark:bg-white/10 text-foreground/80';
     }
   };
 
@@ -160,9 +160,9 @@ export default function CoursesPage() {
 
         {/* Header */}
         <div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-2">Explore Courses</h1>
-          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">Discover and enroll in amazing courses</p>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-500 mt-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">Explore Courses</h1>
+          <p className="text-sm sm:text-base text-foreground/70">Discover and enroll in amazing courses</p>
+          <p className="text-xs sm:text-sm text-foreground/60 mt-2">
             📚 {filteredCourses.length} course{filteredCourses.length !== 1 ? 's' : ''} available for you
           </p>
         </div>
@@ -170,7 +170,7 @@ export default function CoursesPage() {
         {/* Search and Filters */}
         <div className="space-y-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-foreground/50" />
             <Input
               placeholder="Search courses..."
               value={searchTerm}

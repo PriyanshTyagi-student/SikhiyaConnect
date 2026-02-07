@@ -85,8 +85,8 @@ function DiscussionsContent() {
     <DashboardLayout>
       <div className="space-y-8">
         <div>
-          <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">Community Forum</h1>
-          <p className="text-slate-600 dark:text-slate-400">Ask questions, share knowledge, and help each other learn</p>
+          <h1 className="text-4xl font-bold text-foreground mb-2">Community Forum</h1>
+          <p className="text-foreground/70">Ask questions, share knowledge, and help each other learn</p>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
@@ -94,7 +94,7 @@ function DiscussionsContent() {
           <div className="lg:col-span-1 space-y-4">
             <div className="flex gap-2">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground/50" />
                 <Input
                   placeholder="Search discussions..."
                   value={searchTerm}
@@ -112,23 +112,23 @@ function DiscussionsContent() {
                 <button
                   key={discussion.id}
                   onClick={() => setSelectedDiscussion(discussion)}
-                  className={`w-full text-left p-4 rounded-lg transition-colors ${
+                  className={`w-full text-left p-4 rounded-xl transition-colors ${
                     selectedDiscussion?.id === discussion.id
-                      ? 'bg-blue-100 dark:bg-blue-900/30'
-                      : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700'
+                      ? 'bg-white/70 dark:bg-white/10 ring-1 ring-white/20'
+                      : 'bg-white/40 dark:bg-white/5 hover:bg-white/60 dark:hover:bg-white/10'
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <MessageSquare className="w-4 h-4 mt-1 flex-shrink-0 text-slate-600 dark:text-slate-400" />
+                    <MessageSquare className="w-4 h-4 mt-1 flex-shrink-0 text-foreground/60" />
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-slate-900 dark:text-white line-clamp-2">{discussion.title}</h3>
-                      <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                      <h3 className="font-medium text-foreground line-clamp-2">{discussion.title}</h3>
+                      <p className="text-xs text-foreground/60 mt-1">
                         {discussion.replies.length} replies
                       </p>
                       {discussion.isResolved && (
                         <div className="flex items-center gap-1 mt-2">
-                          <CheckCircle2 className="w-3 h-3 text-green-600 dark:text-green-400" />
-                          <span className="text-xs text-green-600 dark:text-green-400">Resolved</span>
+                          <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                          <span className="text-xs text-emerald-500">Resolved</span>
                         </div>
                       )}
                     </div>
@@ -143,36 +143,36 @@ function DiscussionsContent() {
             {selectedDiscussion ? (
               <div className="space-y-6">
                 {/* Original Post */}
-                <Card className="p-6 border-slate-200 dark:border-slate-800">
+                <Card className="p-6">
                   <div className="flex items-start gap-4 mb-6">
                     <div className="text-3xl">
                       {selectedDiscussion.authorRole === 'teacher' ? '👨‍🏫' : '👩‍🎓'}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-slate-900 dark:text-white">{selectedDiscussion.authorName}</h3>
+                        <h3 className="font-semibold text-foreground">{selectedDiscussion.authorName}</h3>
                         {selectedDiscussion.authorRole === 'teacher' && (
-                          <span className="px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 text-xs rounded-full font-medium">
+                          <span className="px-2 py-1 bg-amber-100/80 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 text-xs rounded-full font-medium">
                             Teacher
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-slate-600 dark:text-slate-400">
+                      <p className="text-xs text-foreground/60">
                         {new Date(selectedDiscussion.createdAt).toLocaleDateString()}
                       </p>
                     </div>
                     {selectedDiscussion.isResolved && (
-                      <div className="flex items-center gap-1 px-3 py-1 bg-green-100 dark:bg-green-900/30 rounded-full">
-                        <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
-                        <span className="text-sm text-green-700 dark:text-green-300 font-medium">Resolved</span>
+                      <div className="flex items-center gap-1 px-3 py-1 bg-emerald-100/80 dark:bg-emerald-900/30 rounded-full">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                        <span className="text-sm text-emerald-600 dark:text-emerald-300 font-medium">Resolved</span>
                       </div>
                     )}
                   </div>
 
-                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">{selectedDiscussion.title}</h2>
-                  <p className="text-slate-700 dark:text-slate-300 mb-4">{selectedDiscussion.content}</p>
+                  <h2 className="text-2xl font-bold text-foreground mb-3">{selectedDiscussion.title}</h2>
+                  <p className="text-foreground/70 mb-4">{selectedDiscussion.content}</p>
 
-                  <div className="flex gap-4 text-sm text-slate-600 dark:text-slate-400">
+                  <div className="flex gap-4 text-sm text-foreground/60">
                     <span>{selectedDiscussion.views} views</span>
                     <span>{selectedDiscussion.replies.length} replies</span>
                   </div>
@@ -180,30 +180,30 @@ function DiscussionsContent() {
 
                 {/* Replies */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Replies ({selectedDiscussion.replies.length})</h3>
+                  <h3 className="text-lg font-bold text-foreground">Replies ({selectedDiscussion.replies.length})</h3>
 
                   {selectedDiscussion.replies.map((reply: any) => (
-                    <Card key={reply.id} className="p-4 border-slate-200 dark:border-slate-800">
+                    <Card key={reply.id} className="p-4">
                       <div className="flex items-start gap-3 mb-3">
                         <div className="text-2xl">
                           {reply.authorRole === 'teacher' ? '👨‍🏫' : '👩‍🎓'}
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <h4 className="font-semibold text-slate-900 dark:text-white">{reply.authorName}</h4>
+                            <h4 className="font-semibold text-foreground">{reply.authorName}</h4>
                             {reply.authorRole === 'teacher' && (
-                              <span className="px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 text-xs rounded-full font-medium">
+                              <span className="px-2 py-0.5 bg-amber-100/80 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 text-xs rounded-full font-medium">
                                 Teacher
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-slate-600 dark:text-slate-400">
+                          <p className="text-xs text-foreground/60">
                             {new Date(reply.createdAt).toLocaleDateString()}
                           </p>
                         </div>
                       </div>
 
-                      <p className="text-slate-700 dark:text-slate-300 mb-3">{reply.content}</p>
+                      <p className="text-foreground/70 mb-3">{reply.content}</p>
 
                       <Button
                         variant="outline"

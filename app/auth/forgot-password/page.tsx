@@ -66,11 +66,11 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900 px-4">
-      <Card className="w-full max-w-md p-8">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12">
+      <Card className="w-full max-w-md p-8 border-white/20">
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold">Forgot Password</h1>
-          <p className="text-slate-600 dark:text-slate-400 text-sm">
+          <h1 className="text-2xl font-bold text-foreground">Forgot Password</h1>
+          <p className="text-foreground/70 text-sm">
             Enter your email to receive a verification code
           </p>
         </div>
@@ -94,6 +94,15 @@ export default function ForgotPasswordPage() {
             disabled={loading}
           >
             {loading ? "Sending OTP..." : "Send OTP"}
+          </Button>
+
+          <Button
+            className="w-full"
+            variant="outline"
+            onClick={() => router.push("/")}
+            disabled={loading}
+          >
+            Go back to home
           </Button>
         </div>
       </Card>

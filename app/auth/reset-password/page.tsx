@@ -18,6 +18,7 @@ function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const email = searchParams.get('email') || '';
+  const passwordIsValid = (value: string) => /^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(value);
 
   useEffect(() => {
     if (!email) {
@@ -42,10 +43,10 @@ function ResetPasswordForm() {
       return;
     }
 
-    if (newPassword.length < 6) {
+    if (!passwordIsValid(newPassword)) {
       toast({
         title: 'Error',
-        description: 'Password must be at least 6 characters long',
+        description: 'Password must be at least 8 characters and include letters and numbers',
         variant: 'destructive',
       });
       return;
@@ -84,11 +85,11 @@ function ResetPasswordForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
-      <Card className="w-full max-w-md p-8 space-y-6">
+    <div className="min-h-screen flex items-center justify-center p-4 py-12">
+      <Card className="w-full max-w-md p-8 space-y-6 border-white/20">
         <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold">Reset Password</h1>
-          <p className="text-gray-500 dark:text-gray-400">
+          <h1 className="text-3xl font-bold text-foreground">Reset Password</h1>
+          <p className="text-foreground/70">
             Enter your new password for {email}
           </p>
         </div>
@@ -103,9 +104,10 @@ function ResetPasswordForm() {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               required
-              minLength={6}
+              minLength={8}
               disabled={isLoading}
             />
+            <p className="text-xs text-foreground/60">Use at least 8 characters with letters and numbers.</p>
           </div>
 
           <div className="space-y-2">
@@ -117,7 +119,7 @@ function ResetPasswordForm() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              minLength={6}
+              minLength={8}
               disabled={isLoading}
             />
           </div>
@@ -128,7 +130,7 @@ function ResetPasswordForm() {
         </form>
 
         <div className="text-center text-sm">
-          <Link href="/auth/sign-in" className="text-gray-600 hover:underline">
+          <Link href="/auth/sign-in" className="text-foreground/70 hover:text-foreground underline-offset-4 hover:underline">
             Back to Sign In
           </Link>
         </div>

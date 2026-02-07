@@ -42,6 +42,7 @@ export default function SignUpPage() {
   const { signup } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
+  const passwordIsValid = (value: string) => /^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(value);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,6 +52,15 @@ export default function SignUpPage() {
       toast({
         title: 'Missing Information',
         description: 'Please select your board and class',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!passwordIsValid(password)) {
+      toast({
+        title: 'Weak password',
+        description: 'Password must be at least 8 characters and include letters and numbers.',
         variant: 'destructive',
       });
       return;
@@ -82,12 +92,12 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900 px-4">
-      <Card className="w-full max-w-md border-slate-200 dark:border-slate-800">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12">
+      <Card className="w-full max-w-md border-white/20">
         <div className="p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Join Sikhiya</h1>
-            <p className="text-slate-600 dark:text-slate-400">Create an account to get started.</p>
+            <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-500 via-fuchsia-500 to-indigo-500 mb-2">Join Sikhiya</h1>
+            <p className="text-foreground/70">Create an account to get started.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -127,7 +137,9 @@ export default function SignUpPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
                 required
+                minLength={8}
               />
+              <p className="text-xs text-foreground/60">Use at least 8 characters with letters and numbers.</p>
             </div>
 
             <div className="space-y-3">
@@ -142,7 +154,7 @@ export default function SignUpPage() {
                     disabled={isLoading}
                     className="w-4 h-4"
                   />
-                  <span className="text-slate-700 dark:text-slate-300">👩‍🎓 Student</span>
+                  <span className="text-foreground/80">👩‍🎓 Student</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -153,7 +165,7 @@ export default function SignUpPage() {
                     disabled={isLoading}
                     className="w-4 h-4"
                   />
-                  <span className="text-slate-700 dark:text-slate-300">👨‍🏫 Teacher</span>
+                  <span className="text-foreground/80">👨‍🏫 Teacher</span>
                 </label>
               </div>
             </div>
@@ -203,9 +215,9 @@ export default function SignUpPage() {
             </Button>
           </form>
 
-          <p className="text-center text-sm text-slate-600 dark:text-slate-400 mt-6">
+          <p className="text-center text-sm text-foreground/70 mt-6">
             Already have an account?{' '}
-            <Link href="/auth/sign-in" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">
+            <Link href="/auth/sign-in" className="text-foreground hover:text-foreground underline-offset-4 hover:underline font-medium">
               Sign in
             </Link>
           </p>

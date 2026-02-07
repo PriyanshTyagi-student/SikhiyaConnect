@@ -98,11 +98,11 @@ function VerifyOtpForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
-      <Card className="w-full max-w-md p-8 space-y-6">
+    <div className="min-h-screen flex items-center justify-center p-4 py-12">
+      <Card className="w-full max-w-md p-8 space-y-6 border-white/20">
         <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold">Verify OTP</h1>
-          <p className="text-gray-500 dark:text-gray-400">
+          <h1 className="text-3xl font-bold text-foreground">Verify OTP</h1>
+          <p className="text-foreground/70">
             Enter the OTP sent to {email}
           </p>
         </div>
@@ -131,14 +131,14 @@ function VerifyOtpForm() {
           <button
             onClick={handleResendOtp}
             disabled={isResending}
-            className="text-blue-600 hover:underline disabled:opacity-50"
+            className="text-foreground/70 hover:text-foreground underline-offset-4 hover:underline disabled:opacity-50"
           >
             {isResending ? 'Resending...' : "Didn't receive OTP? Resend"}
           </button>
         </div>
 
         <div className="text-center text-sm">
-          <Link href="/auth/sign-in" className="text-gray-600 hover:underline">
+          <Link href="/auth/sign-in" className="text-foreground/70 hover:text-foreground underline-offset-4 hover:underline">
             Back to Sign In
           </Link>
         </div>

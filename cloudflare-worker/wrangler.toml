@@ -1,0 +1,6 @@
+name = "sikhiya-backend-proxy"
+main = "worker.js"
+compatibility_date = "2026-02-04"
+
+[vars]
+BACKEND_URL = "https://sikhiya-backend-worker.sikhiyaconnect.workers.dev"

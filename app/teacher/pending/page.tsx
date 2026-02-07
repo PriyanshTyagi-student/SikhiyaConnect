@@ -5,11 +5,14 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { AlertCircle, Clock, CheckCircle } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 export default function TeacherPendingPage() {
-  const { user, isInitialized } = useAuth();
+  const { user, isInitialized, refreshUser } = useAuth();
   const router = useRouter();
+  const [isChecking, setIsChecking] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!isInitialized) {
@@ -35,6 +38,35 @@ export default function TeacherPendingPage() {
 
   const handleLogout = () => {
     router.push('/auth/sign-in');
+  };
+
+  const handleCheckStatus = async () => {
+    setIsChecking(true);
+    try {
+      const updated = await refreshUser();
+      const status = updated?.teacherStatus ?? user?.teacherStatus;
+      if (status === 'approved') {
+        router.push('/teacher');
+        return;
+      }
+      if (status === 'rejected') {
+        router.push('/');
+        return;
+      }
+      toast({
+        title: 'Status unchanged',
+        description: 'Your application is still pending. Please check again later.',
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to check status.';
+      toast({
+        title: 'Error',
+        description: message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsChecking(false);
+    }
   };
 
   return (
@@ -210,12 +242,10 @@ export default function TeacherPendingPage() {
             Go Back to Home
           </Button>
           <Button
-            onClick={() => {
-              // Refresh to check for updates
-              router.refresh();
-            }}
+            onClick={handleCheckStatus}
+            disabled={isChecking}
           >
-            Check Status
+            {isChecking ? 'Checking...' : 'Check Status'}
           </Button>
         </div>
       </div>

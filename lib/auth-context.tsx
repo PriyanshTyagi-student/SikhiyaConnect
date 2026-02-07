@@ -3,14 +3,14 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { User } from './types';
 import { mockUsers } from './mock-data';
-import { getAPIURL, initializeAPI } from './api';
+import { getAPIURL, initializeAPI, getCurrentUser } from './api';
 
 interface AuthContextType {
   user: User | null;
   token: string | null;
   isLoading: boolean;
   isInitialized: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
   setSession: (token: string, user: User) => void;
   logout: () => void;
   signup: (email: string, password: string, name: string, role: 'student' | 'teacher', board?: string, student_class?: string) => Promise<void>;
@@ -18,6 +18,7 @@ interface AuthContextType {
   rejectTeacher: (teacherId: string) => void;
   getPendingTeachers: () => User[];
   updateUser: (user: User) => void;
+  refreshUser: () => Promise<User | null>;
 }
 
 const TOKEN_KEY = "sikhiya_token";
@@ -74,6 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   setToken(data.access_token);
   setUser(data.user);
   setIsLoading(false);
+  return data.user as User;
 };
 
   const setSession = useCallback((sessionToken: string, sessionUser: User) => {
@@ -160,8 +162,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUsersData(prev => ({ ...prev, [updatedUser.id]: updatedUser }));
   }, []);
 
+  const refreshUser = useCallback(async () => {
+    if (!token) return null;
+    try {
+      const data = await getCurrentUser(token);
+      if (data?.user) {
+        localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+        setUser(data.user);
+        return data.user as User;
+      }
+      return null;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (message.includes('(401)') || message.includes('(404)')) {
+        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(USER_KEY);
+        setToken(null);
+        setUser(null);
+      }
+      throw error;
+    }
+  }, [token]);
+
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, isInitialized, login, setSession, logout, signup, approveTeacher, rejectTeacher, getPendingTeachers, updateUser }}>
+    <AuthContext.Provider value={{ user, token, isLoading, isInitialized, login, setSession, logout, signup, approveTeacher, rejectTeacher, getPendingTeachers, updateUser, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
